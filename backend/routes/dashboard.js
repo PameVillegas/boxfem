@@ -22,13 +22,19 @@ router.get('/stats', async (req, res) => {
       where: { date: dayjs().format('YYYY-MM-DD') }
     })
 
-    const classes = await Class.findAll({
-      attributes: ['id', 'name', [fn('COUNT', col('Clients.id')), 'enrolledCount']],
-      include: [{ model: Client, attributes: [], through: { attributes: [] } }],
-      group: ['Class.id'],
-      order: [[literal('"enrolledCount"'), 'DESC']],
-      limit: 5
-    })
+    let popularClasses = []
+    try {
+      const classes = await Class.findAll({
+        attributes: ['id', 'name'],
+        include: [{ model: Client, attributes: ['id'], through: { attributes: [] } }]
+      })
+      popularClasses = classes
+        .map(c => ({ name: c.name, enrolledCount: c.Clients ? c.Clients.length : 0 }))
+        .sort((a, b) => b.enrolledCount - a.enrolledCount)
+        .slice(0, 5)
+    } catch (e) {
+      // Si falla la query de clases, no romper el dashboard
+    }
 
     res.json({
       totalClients,
@@ -36,7 +42,7 @@ router.get('/stats', async (req, res) => {
       expiredClients,
       monthlyIncome: parseFloat(monthlyPayments[0]?.getDataValue('total') || 0),
       todayAttendance,
-      popularClasses: classes.map(c => ({ name: c.name, enrolledCount: parseInt(c.getDataValue('enrolledCount') || 0) }))
+      popularClasses
     })
   } catch (error) {
     res.status(500).json({ error: error.message })
