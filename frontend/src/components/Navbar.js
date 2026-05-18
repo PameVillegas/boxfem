@@ -51,7 +51,7 @@ function Navbar() {
         height: 56
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/logobox.jpeg" alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
+          <img src="/logobox.png" alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
           <span style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>FEMMBOX</span>
         </div>
 
@@ -85,7 +85,7 @@ function Navbar() {
       <Drawer
         title={
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/logobox.jpeg" alt="" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
+            <img src="/logobox.png" alt="" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
             <span style={{ fontWeight: 'bold' }}>FEMMBOX</span>
           </div>
         }
