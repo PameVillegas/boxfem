@@ -74,7 +74,7 @@ export const whatsappAPI = {
 }
 
 export const portalAPI = {
-  login: (phone, code) => api.post('/portal/login', { phone, code }),
+  login: (name, lastName, code) => api.post('/portal/login', { name, lastName, code }),
   getProfile: () => api.get('/portal/profile'),
   getPayments: () => api.get('/portal/payments'),
   getAttendance: () => api.get('/portal/attendance'),

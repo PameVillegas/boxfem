@@ -10,6 +10,7 @@ function ClientPortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [loading, setLoading] = useState(false)
   const [phone, setPhone] = useState('')
+  const [lastName, setLastName] = useState('')
   const [code, setCode] = useState('')
   const [profile, setProfile] = useState(null)
   const [payments, setPayments] = useState([])
@@ -27,10 +28,10 @@ function ClientPortal() {
   }, [])
 
   const handleLogin = async () => {
-    if (!phone || !code) return message.warning('Completá teléfono y código')
+    if (!phone || !lastName || !code) return message.warning('Completá todos los campos')
     setLoading(true)
     try {
-      const res = await portalAPI.login(phone, code)
+      const res = await portalAPI.login(phone, lastName, code)
       localStorage.setItem('clientToken', res.data.token)
       localStorage.setItem('token', res.data.token)
       setProfile(res.data.client)
@@ -113,10 +114,17 @@ function ClientPortal() {
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Input
               size="large"
-              prefix={<PhoneOutlined />}
-              placeholder="Tu teléfono (ej: 3388431158)"
+              prefix={<UserOutlined />}
+              placeholder="Tu nombre"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+            />
+            <Input
+              size="large"
+              prefix={<UserOutlined />}
+              placeholder="Tu apellido"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
             />
             <Input.Password
               size="large"

@@ -5,21 +5,25 @@ const { Client, Payment, Attendance, Class } = require('../models')
 const { Op } = require('sequelize')
 const dayjs = require('dayjs')
 
-// Login de cliente con teléfono + código personal
+// Login de cliente con nombre + apellido + código personal
 router.post('/login', async (req, res) => {
   try {
-    const { phone, code } = req.body
-    const cleanPhone = phone.replace(/[^0-9]/g, '')
+    const { name, lastName, code } = req.body
+
+    if (!name || !lastName || !code) {
+      return res.status(400).json({ error: 'Completá nombre, apellido y código' })
+    }
 
     const client = await Client.findOne({
       where: {
-        phone: { [Op.like]: `%${cleanPhone.slice(-8)}` },
-        personalCode: code
+        name: { [Op.iLike]: name.trim() },
+        lastName: { [Op.iLike]: lastName.trim() },
+        personalCode: code.trim()
       }
     })
 
     if (!client) {
-      return res.status(400).json({ error: 'Teléfono o código incorrecto' })
+      return res.status(400).json({ error: 'Datos incorrectos. Consultá tu código en recepción.' })
     }
 
     const token = jwt.sign(
