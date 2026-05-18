@@ -49,9 +49,9 @@ function Dashboard() {
 
   return (
     <div>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 20 }}>
+      <Row justify="space-between" align="middle" style={{ marginBottom: 12 }}>
         <Col>
-          <Title level={3} style={{ margin: 0 }}>Dashboard</Title>
+          <Title level={4} style={{ margin: 0 }}>Dashboard</Title>
         </Col>
         <Col>
           {alerts.length > 0 && (
@@ -62,30 +62,30 @@ function Dashboard() {
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12} md={6}>
-          <Card hoverable onClick={() => navigate('/clients')}>
+      <Row gutter={[12, 12]}>
+        <Col xs={12} sm={12} md={6}>
+          <Card hoverable onClick={() => navigate('/clients')} bodyStyle={{ padding: 16 }}>
             <Statistic title="Total Clientes" value={stats?.totalClients || 0} prefix={<UserOutlined />} />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card hoverable>
-            <Statistic title="Clientes Activos" value={stats?.activeClients || 0} prefix={<CheckCircleOutlined style={{ color: 'green' }} />} valueStyle={{ color: 'green' }} />
+        <Col xs={12} sm={12} md={6}>
+          <Card hoverable bodyStyle={{ padding: 16 }}>
+            <Statistic title="Activos" value={stats?.activeClients || 0} prefix={<CheckCircleOutlined style={{ color: 'green' }} />} valueStyle={{ color: 'green' }} />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card hoverable>
-            <Statistic title="Cuotas Vencidas" value={stats?.expiredClients || 0} prefix={<WarningOutlined style={{ color: 'red' }} />} valueStyle={{ color: 'red' }} />
+        <Col xs={12} sm={12} md={6}>
+          <Card hoverable bodyStyle={{ padding: 16 }}>
+            <Statistic title="Vencidas" value={stats?.expiredClients || 0} prefix={<WarningOutlined style={{ color: 'red' }} />} valueStyle={{ color: 'red' }} />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card hoverable>
-            <Statistic title="Ingresos del Mes" value={stats?.monthlyIncome || 0} prefix={<DollarOutlined />} suffix="$" />
+        <Col xs={12} sm={12} md={6}>
+          <Card hoverable bodyStyle={{ padding: 16 }}>
+            <Statistic title="Ingresos Mes" value={stats?.monthlyIncome || 0} prefix={<DollarOutlined />} suffix="$" />
           </Card>
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
+      <Row gutter={[12, 12]} style={{ marginTop: 16 }}>
         <Col xs={24} md={12}>
           <Card title="Asistencia de Hoy">
             <Statistic value={stats?.todayAttendance || 0} suffix="personas" />

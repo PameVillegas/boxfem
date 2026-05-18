@@ -23,7 +23,7 @@ function AppContent() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       {user && <Navbar />}
-      <Content style={{ padding: '24px', marginTop: user ? 64 : 0, background: '#fce4ec', minHeight: 'calc(100vh - 134px)' }}>
+      <Content style={{ padding: '16px', marginTop: user ? 56 : 0, background: '#fce4ec', minHeight: 'calc(100vh - 120px)' }}>
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
