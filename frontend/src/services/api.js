@@ -75,12 +75,12 @@ export const whatsappAPI = {
 
 export const portalAPI = {
   login: (name, lastName, code) => api.post('/portal/login', { name, lastName, code }),
-  getProfile: () => api.get('/portal/profile'),
-  getPayments: () => api.get('/portal/payments'),
-  getAttendance: () => api.get('/portal/attendance'),
-  getClasses: () => api.get('/portal/classes'),
-  enroll: (classId) => api.post(`/portal/classes/${classId}/enroll`),
-  unenroll: (classId) => api.post(`/portal/classes/${classId}/unenroll`)
+  getProfile: (config) => api.get('/portal/profile', config),
+  getPayments: (config) => api.get('/portal/payments', config),
+  getAttendance: (config) => api.get('/portal/attendance', config),
+  getClasses: (config) => api.get('/portal/classes', config),
+  enroll: (classId, config) => api.post(`/portal/classes/${classId}/enroll`, {}, config),
+  unenroll: (classId, config) => api.post(`/portal/classes/${classId}/unenroll`, {}, config)
 }
 
 export default api

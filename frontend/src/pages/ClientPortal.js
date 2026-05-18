@@ -21,9 +21,8 @@ function ClientPortal() {
   useEffect(() => {
     const token = localStorage.getItem('clientToken')
     if (token) {
-      localStorage.setItem('token', token)
       setIsLoggedIn(true)
-      loadData()
+      loadData(token)
     }
   }, [])
 
@@ -33,10 +32,9 @@ function ClientPortal() {
     try {
       const res = await portalAPI.login(phone, lastName, code)
       localStorage.setItem('clientToken', res.data.token)
-      localStorage.setItem('token', res.data.token)
       setProfile(res.data.client)
       setIsLoggedIn(true)
-      loadData()
+      loadData(res.data.token)
       message.success(`Hola ${res.data.client.name}!`)
     } catch (error) {
       message.error(error.response?.data?.error || 'Error al iniciar sesión')
@@ -45,14 +43,15 @@ function ClientPortal() {
     }
   }
 
-  const loadData = async () => {
+  const loadData = async (token) => {
     setDataLoading(true)
+    const config = { headers: { Authorization: `Bearer ${token || localStorage.getItem('clientToken')}` } }
     try {
       const [profileRes, paymentsRes, classesRes, attendanceRes] = await Promise.all([
-        portalAPI.getProfile(),
-        portalAPI.getPayments(),
-        portalAPI.getClasses(),
-        portalAPI.getAttendance()
+        portalAPI.getProfile(config),
+        portalAPI.getPayments(config),
+        portalAPI.getClasses(config),
+        portalAPI.getAttendance(config)
       ])
       setProfile(profileRes.data)
       setPayments(paymentsRes.data)
@@ -69,14 +68,14 @@ function ClientPortal() {
 
   const handleLogout = () => {
     localStorage.removeItem('clientToken')
-    localStorage.removeItem('token')
     setIsLoggedIn(false)
     setProfile(null)
   }
 
   const handleEnroll = async (classId) => {
     try {
-      await portalAPI.enroll(classId)
+      const config = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }
+      await portalAPI.enroll(classId, config)
       message.success('Te inscribiste!')
       loadData()
     } catch (error) {
@@ -86,7 +85,8 @@ function ClientPortal() {
 
   const handleUnenroll = async (classId) => {
     try {
-      await portalAPI.unenroll(classId)
+      const config = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }
+      await portalAPI.unenroll(classId, config)
       message.success('Te desinscribiste')
       loadData()
     } catch (error) {

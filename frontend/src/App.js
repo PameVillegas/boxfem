@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { ConfigProvider, Layout, theme } from 'antd'
 import esES from 'antd/locale/es_ES'
 import Login from './pages/Login'
@@ -18,16 +18,21 @@ const { Content, Footer } = Layout
 
 function AppContent() {
   const { user, loading } = useAuth()
-  
+  const location = useLocation()
+
   if (loading) return <div>Cargando...</div>
-  
+
+  // El portal de clientes es completamente independiente, sin navbar ni layout admin
+  if (location.pathname === '/portal') {
+    return <ClientPortal />
+  }
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       {user && <Navbar />}
       <Content style={{ padding: '12px', marginTop: user ? 52 : 0, background: '#fce4ec', minHeight: 'calc(100vh - 100px)', overflow: 'hidden' }}>
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path="/portal" element={<ClientPortal />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/clients" element={<PrivateRoute><Clients /></PrivateRoute>} />
           <Route path="/payments" element={<PrivateRoute><Payments /></PrivateRoute>} />
@@ -37,8 +42,8 @@ function AppContent() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>
-        FEMMBOX ©2026 - Gestión de Gimnasio de Boxeo
+      <Footer style={{ textAlign: 'center', padding: '12px' }}>
+        FEMMBOX ©2026
       </Footer>
     </Layout>
   )
