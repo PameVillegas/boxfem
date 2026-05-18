@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ConfigProvider, Layout, theme } from 'antd'
 import esES from 'antd/locale/es_ES'
 import Login from './pages/Login'
+import ClientPortal from './pages/ClientPortal'
 import Dashboard from './pages/Dashboard'
 import Clients from './pages/Clients'
 import Payments from './pages/Payments'
@@ -26,6 +27,7 @@ function AppContent() {
       <Content style={{ padding: '16px', marginTop: user ? 56 : 0, background: '#fce4ec', minHeight: 'calc(100vh - 120px)' }}>
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+          <Route path="/portal" element={<ClientPortal />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/clients" element={<PrivateRoute><Clients /></PrivateRoute>} />
           <Route path="/payments" element={<PrivateRoute><Payments /></PrivateRoute>} />

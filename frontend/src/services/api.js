@@ -73,4 +73,14 @@ export const whatsappAPI = {
   startQR: () => api.post('/whatsapp/start-qr')
 }
 
+export const portalAPI = {
+  login: (phone, code) => api.post('/portal/login', { phone, code }),
+  getProfile: () => api.get('/portal/profile'),
+  getPayments: () => api.get('/portal/payments'),
+  getAttendance: () => api.get('/portal/attendance'),
+  getClasses: () => api.get('/portal/classes'),
+  enroll: (classId) => api.post(`/portal/classes/${classId}/enroll`),
+  unenroll: (classId) => api.post(`/portal/classes/${classId}/unenroll`)
+}
+
 export default api
