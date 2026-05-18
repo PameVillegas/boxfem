@@ -284,6 +284,30 @@ function ClientPortal() {
       <Card style={{ borderRadius: 12 }}>
         <Tabs items={tabItems} defaultActiveKey="classes" />
       </Card>
+
+      {/* Recordatorio de pagos */}
+      <Card style={{ marginTop: 12, borderRadius: 12, background: '#fff3e0', border: '1px solid #ffe0b2' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+          <DollarOutlined style={{ fontSize: 24, color: '#f57c00', marginTop: 2 }} />
+          <div>
+            <Text strong style={{ color: '#e65100' }}>Recordá mantener tu cuota al día</Text>
+            <br />
+            <Text style={{ fontSize: 13, color: '#bf360c' }}>
+              Abonando antes del día 10 evitás el recargo del 10%. Podés pagar en efectivo, transferencia o MercadoPago.
+            </Text>
+          </div>
+        </div>
+      </Card>
+
+      {/* Info sobre boxeo */}
+      <Card style={{ marginTop: 12, borderRadius: 12, background: 'linear-gradient(135deg, #fce4ec, #f8bbd0)' }}>
+        <Title level={5} style={{ color: '#c2185b', marginBottom: 8 }}>🥊 ¿Por qué entrenar boxeo?</Title>
+        <Text style={{ fontSize: 13, color: '#4a148c' }}>
+          El boxeo es uno de los entrenamientos más completos que existen. Mejora tu resistencia cardiovascular, 
+          tonifica todo el cuerpo, libera estrés y aumenta tu confianza. Cada sesión quemás entre 400 y 700 calorías 
+          mientras desarrollás coordinación, reflejos y fuerza mental. No importa tu nivel — acá crecemos juntas. 💪
+        </Text>
+      </Card>
     </div>
   )
 }
