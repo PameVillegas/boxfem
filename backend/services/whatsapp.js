@@ -47,7 +47,7 @@ async function initWhatsApp(phoneNumber = null) {
       auth: state,
       printQRInTerminal: false,
       syncFullHistory: false,
-      browser: usePairingCode ? ['Chrome (Linux)', '', ''] : ['BoxFem', 'Chrome', '120.0.0.0'],
+      browser: usePairingCode ? ['Chrome (Linux)', '', ''] : ['FemmBox', 'Chrome', '120.0.0.0'],
       logger,
       version,
       connectTimeoutMs: 120000,

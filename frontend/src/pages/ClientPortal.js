@@ -106,8 +106,8 @@ function ClientPortal() {
       }}>
         <Card style={{ width: '100%', maxWidth: 380, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <img src="/logobox.jpeg" alt="BoxFem" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #e91e63' }} />
-            <Title level={3} style={{ color: '#e91e63', marginTop: 12, marginBottom: 4 }}>BOXFEM</Title>
+            <img src="/logobox.jpeg" alt="FemmBox" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #e91e63' }} />
+            <Title level={3} style={{ color: '#e91e63', marginTop: 12, marginBottom: 4 }}>FEMMBOX</Title>
             <Text type="secondary">Portal de Alumnas</Text>
           </div>
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>

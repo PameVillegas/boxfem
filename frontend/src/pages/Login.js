@@ -41,10 +41,10 @@ function Login() {
         <div style={{ textAlign: 'center', marginBottom: 30 }}>
           <img
             src="/logobox.jpeg"
-            alt="BoxFem"
+            alt="FemmBox"
             style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', marginBottom: 16, border: '3px solid #e91e63' }}
           />
-          <Title level={2} style={{ color: '#e91e63', marginBottom: 0 }}>BOXFEM</Title>
+          <Title level={2} style={{ color: '#e91e63', marginBottom: 0 }}>FEMMBOX</Title>
           <Text style={{ color: '#888' }}>Gestión de Gimnasio de Boxeo</Text>
         </div>
         <Form name="login" onFinish={onFinish} size="large">

@@ -38,7 +38,7 @@ function AppContent() {
         </Routes>
       </Content>
       <Footer style={{ textAlign: 'center' }}>
-        BoxFem ©2026 - Gestión de Gimnasio de Boxeo
+        FEMMBOX ©2026 - Gestión de Gimnasio de Boxeo
       </Footer>
     </Layout>
   )

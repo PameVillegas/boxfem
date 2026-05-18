@@ -19,7 +19,7 @@ async function checkPendingPayments() {
     })
 
     for (const client of expiringSoon) {
-      const msg = `🧤 *BoxFem - Recordatorio de Pago*\n\nHola ${client.name}, recordá abonar tu cuota antes del 10 de este mes para evitar recargos.\n\nGracias!`
+      const msg = `🧤 *FemmBox - Recordatorio de Pago*\n\nHola ${client.name}, recordá abonar tu cuota antes del 10 de este mes para evitar recargos.\n\nGracias!`
       await Alert.create({
         clientId: client.id,
         type: 'payment_reminder',
@@ -44,7 +44,7 @@ async function checkPendingPayments() {
     })
 
     for (const client of unpaid) {
-      const msg = `⚠️ *BoxFem - Aviso de Recargo*\n\nHola ${client.name}, tu cuota está vencida y se aplicó un recargo del 10%. Pasá a regularizar tu situación.\n\nGracias!`
+      const msg = `⚠️ *FemmBox - Aviso de Recargo*\n\nHola ${client.name}, tu cuota está vencida y se aplicó un recargo del 10%. Pasá a regularizar tu situación.\n\nGracias!`
       await Alert.create({
         clientId: client.id,
         type: 'surcharge',
@@ -71,7 +71,7 @@ async function checkDailyExpirations() {
     client.status = 'expired'
     await client.save()
 
-    const msg = `⏰ *BoxFem - Cuota Vencida*\n\nHola ${client.name}, tu cuota venció el ${dayjs(client.expirationDate).format('DD/MM/YYYY')}. Acercate a renovar para seguir entrenando.`
+    const msg = `⏰ *FemmBox - Cuota Vencida*\n\nHola ${client.name}, tu cuota venció el ${dayjs(client.expirationDate).format('DD/MM/YYYY')}. Acercate a renovar para seguir entrenando.`
     await Alert.create({
       clientId: client.id,
       type: 'expiration',

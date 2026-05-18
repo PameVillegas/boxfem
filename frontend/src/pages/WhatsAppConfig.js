@@ -55,7 +55,7 @@ function WhatsAppConfig() {
     if (!testPhone) return message.warning('Ingresá un número')
     setSending(true)
     try {
-      await whatsappAPI.sendTest(testPhone, `🧤 *BoxFem - Mensaje de prueba*\n\nHola! Este es un mensaje de prueba.\nLos recordatorios se enviarán automáticamente.`)
+      await whatsappAPI.sendTest(testPhone, `🧤 *FemmBox - Mensaje de prueba*\n\nHola! Este es un mensaje de prueba.\nLos recordatorios se enviarán automáticamente.`)
       message.success('Mensaje enviado!')
     } catch (error) {
       message.error(error.response?.data?.error || 'Error al enviar')
