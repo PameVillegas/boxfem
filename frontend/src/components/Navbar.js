@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Layout, Menu, Typography, Drawer, Button } from 'antd'
+import { Layout, Menu, Drawer, Button } from 'antd'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { 
   DashboardOutlined, 
@@ -42,17 +42,21 @@ function Navbar() {
         alignItems: 'center',
         justifyContent: 'space-between',
         background: 'linear-gradient(90deg, #e91e63, #d81b60)',
-        padding: '0 16px',
+        padding: '0 12px',
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         zIndex: 100,
-        height: 56
+        height: 52
       }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/logobox.png" alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
-          <span style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>FEMMBOX</span>
+        {/* Logo clickeable */}
+        <div
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+          onClick={() => navigate('/dashboard')}
+        >
+          <img src="/logobox.png" alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', marginRight: 8 }} />
+          <span style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>FEMMBOX</span>
         </div>
 
         {/* Desktop menu */}
@@ -63,36 +67,37 @@ function Navbar() {
           items={menuItems}
           onClick={({ key }) => navigate(key)}
           className="desktop-menu"
-          style={{ flex: 1, background: 'transparent', borderBottom: 'none', marginLeft: 20 }}
+          style={{ flex: 1, background: 'transparent', borderBottom: 'none', marginLeft: 16, minWidth: 0 }}
         />
 
         {/* Mobile hamburger */}
         <Button
           type="text"
-          icon={<MenuOutlined style={{ color: 'white', fontSize: 22 }} />}
+          icon={<MenuOutlined style={{ color: 'white', fontSize: 20 }} />}
           onClick={() => setDrawerOpen(true)}
           className="mobile-menu-btn"
+          style={{ padding: 4 }}
         />
 
         <LogoutOutlined 
           onClick={logout} 
           className="desktop-menu"
-          style={{ color: 'white', fontSize: 18, cursor: 'pointer', marginLeft: 16 }} 
+          style={{ color: 'white', fontSize: 16, cursor: 'pointer', marginLeft: 12 }} 
         />
       </Header>
 
       {/* Mobile drawer */}
       <Drawer
         title={
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/logobox.png" alt="" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', marginRight: 10 }} />
+          <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => { navigate('/dashboard'); setDrawerOpen(false) }}>
+            <img src="/logobox.png" alt="" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', marginRight: 8 }} />
             <span style={{ fontWeight: 'bold' }}>FEMMBOX</span>
           </div>
         }
         placement="left"
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
-        width={260}
+        width={240}
         bodyStyle={{ padding: 0 }}
       >
         <Menu
@@ -100,13 +105,13 @@ function Navbar() {
           selectedKeys={[location.pathname]}
           items={menuItems}
           onClick={({ key }) => handleNavigate(key)}
-          style={{ border: 'none', fontSize: 16 }}
+          style={{ border: 'none', fontSize: 15 }}
         />
-        <div style={{ padding: '20px 24px', borderTop: '1px solid #f0f0f0', marginTop: 16 }}>
-          <div style={{ marginBottom: 12, color: '#666' }}>
+        <div style={{ padding: '16px 20px', borderTop: '1px solid #f0f0f0', marginTop: 12 }}>
+          <div style={{ marginBottom: 10, color: '#666', fontSize: 13 }}>
             {user?.name || user?.username}
           </div>
-          <Button danger icon={<LogoutOutlined />} onClick={() => { logout(); setDrawerOpen(false) }} block>
+          <Button danger icon={<LogoutOutlined />} onClick={() => { logout(); setDrawerOpen(false) }} block size="small">
             Cerrar Sesión
           </Button>
         </div>

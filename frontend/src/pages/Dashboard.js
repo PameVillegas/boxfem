@@ -48,7 +48,7 @@ function Dashboard() {
   const chartData = stats?.popularClasses?.map(c => ({ name: c.name, inscritos: c.enrolledCount })) || []
 
   return (
-    <div>
+    <div style={{ maxWidth: '100%', overflow: 'hidden' }}>
       <Row justify="space-between" align="middle" style={{ marginBottom: 12 }}>
         <Col>
           <Title level={4} style={{ margin: 0 }}>Dashboard</Title>
@@ -87,21 +87,23 @@ function Dashboard() {
 
       <Row gutter={[12, 12]} style={{ marginTop: 16 }}>
         <Col xs={24} md={12}>
-          <Card title="Asistencia de Hoy">
+          <Card title="Asistencia de Hoy" bodyStyle={{ padding: 16 }}>
             <Statistic value={stats?.todayAttendance || 0} suffix="personas" />
           </Card>
         </Col>
         <Col xs={24} md={12}>
-          <Card title="Clases Más Populares">
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="inscritos" fill="#e91e63" />
-              </BarChart>
-            </ResponsiveContainer>
+          <Card title="Clases Más Populares" bodyStyle={{ padding: '16px 8px' }}>
+            <div style={{ width: '100%', overflowX: 'hidden' }}>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="inscritos" fill="#e91e63" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </Card>
         </Col>
       </Row>
