@@ -11,13 +11,32 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT,
     dialect: 'postgres',
     logging: false,
+    pool: {
+      max: 5,
+      min: 1,
+      acquire: 30000,
+      idle: 10000
+    },
+    retry: {
+      max: 3
+    },
     dialectOptions: isProduction ? {
       ssl: {
         require: true,
         rejectUnauthorized: false
-      }
+      },
+      connectTimeout: 30000
     } : {}
   }
 )
+
+// Mantener la conexión viva (evita cold starts de Neon)
+if (isProduction) {
+  setInterval(async () => {
+    try {
+      await sequelize.query('SELECT 1')
+    } catch (e) {}
+  }, 60000) // ping cada 60 segundos
+}
 
 module.exports = sequelize
