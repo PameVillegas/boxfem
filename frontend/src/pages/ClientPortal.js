@@ -226,25 +226,52 @@ function ClientPortal() {
       {/* Contenido de la sección activa */}
       {activeSection === 'horarios' && (
         <Card size="small" style={{ borderRadius: 12 }}>
-          <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>Elegí tus días y horarios</Title>
+          <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>Mis Entrenamientos</Title>
 
-          {/* Resumen de inscripción */}
-          {enrolledDays > 0 && (
-            <Alert
-              type="success"
-              showIcon
-              style={{ marginBottom: 12 }}
-              message={<span>Estás en <strong>{enrolledDays} día{enrolledDays > 1 ? 's' : ''}</strong> — Plan: <strong>{currentPlan.label}</strong> (${currentPlan.price.toLocaleString()})</span>}
-              description={enrolledDays === 1 ? 'Si te anotás en otro día, tu plan pasa a 2 veces ($25.000)' : enrolledDays === 2 ? 'Si te anotás en un día más, tu plan pasa a semana completa ($35.000). Diferencia: $10.000' : null}
-            />
+          {/* Resumen: días y horarios inscriptos */}
+          {enrolledClasses.length > 0 ? (
+            <Card size="small" style={{ marginBottom: 12, background: '#2d2d2d', border: '1px solid #ff1493' }}>
+              <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 6 }}>📋 Estoy inscripta en:</Text>
+              {['monday', 'wednesday', 'friday'].map(day => {
+                const myClasses = enrolledClasses.filter(c => c.dayOfWeek === day)
+                if (myClasses.length === 0) return null
+                return (
+                  <div key={day} style={{ marginBottom: 4 }}>
+                    <Text style={{ color: '#fff' }}>
+                      <strong>{dayNames[day]}:</strong> {myClasses.map(c => `${c.startTime}-${c.endTime}`).join(', ')}
+                    </Text>
+                  </div>
+                )
+              })}
+              <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #444' }}>
+                <Text style={{ color: '#fff' }}>
+                  Plan: <strong>{currentPlan.label}</strong> — <strong style={{ color: '#ff1493' }}>${currentPlan.price.toLocaleString()}</strong>
+                </Text>
+              </div>
+            </Card>
+          ) : (
+            <Alert message="Todavía no elegiste tus días. Seleccioná abajo en qué horarios querés entrenar." type="info" showIcon style={{ marginBottom: 12 }} />
+          )}
+
+          {/* Aviso de cambio de plan */}
+          {enrolledDays === 1 && (
+            <Alert style={{ marginBottom: 12 }} type="warning" showIcon message="Si te anotás en otro día, tu plan pasa a 2 veces por semana ($25.000)" />
+          )}
+          {enrolledDays === 2 && (
+            <Alert style={{ marginBottom: 12 }} type="warning" showIcon message="Si te anotás en un día más, tu plan pasa a semana completa ($35.000). Diferencia: $10.000" />
           )}
 
           {/* Cuotas */}
-          <div style={{ marginBottom: 12, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            <Tag color={enrolledDays === 2 ? 'green' : 'default'}>2x sem: $25.000</Tag>
-            <Tag color={enrolledDays === 3 ? 'green' : 'default'}>3x sem: $30.000</Tag>
-            <Tag color={enrolledDays >= 3 ? 'green' : 'default'}>Completa: $35.000</Tag>
+          <div style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 12, color: '#aaa', display: 'block', marginBottom: 6 }}>Planes disponibles:</Text>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <Tag color={enrolledDays === 2 ? '#ff1493' : 'default'}>2x sem: $25.000</Tag>
+              <Tag color={enrolledDays === 3 ? '#ff1493' : 'default'}>3x sem: $30.000</Tag>
+              <Tag color={enrolledDays >= 3 ? '#ff1493' : 'default'}>L-M-V: $35.000</Tag>
+            </div>
           </div>
+
+          <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 8 }}>Elegí o cambiá tus días y horarios:</Text>
 
           {/* Días */}
           {['monday', 'wednesday', 'friday'].map(day => {
@@ -252,27 +279,33 @@ function ClientPortal() {
             const isEnrolledInDay = enrolledClasses.some(c => c.dayOfWeek === day)
 
             return (
-              <div key={day} style={{ marginBottom: 10 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <Text strong style={{ color: '#ff1493', fontSize: 13 }}>{dayNames[day]}</Text>
-                  {isEnrolledInDay && <Tag color="green" style={{ fontSize: 10 }}>Inscripta</Tag>}
+              <div key={day} style={{ marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <Text strong style={{ color: '#ff1493', fontSize: 14 }}>{dayNames[day]}</Text>
+                  {isEnrolledInDay && <Tag color="green" style={{ fontSize: 10 }}>✓ Inscripta</Tag>}
                 </div>
                 {dayClasses.length > 0 ? dayClasses.map(item => (
-                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 8px', background: item.isEnrolled ? '#f6ffed' : '#fafafa', borderRadius: 6, marginBottom: 4, border: item.isEnrolled ? '1px solid #b7eb8f' : '1px solid #f0f0f0' }}>
+                  <div key={item.id} style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '8px 10px', borderRadius: 8, marginBottom: 4,
+                    background: item.isEnrolled ? '#1a3a1a' : '#2d2d2d',
+                    border: item.isEnrolled ? '1px solid #52c41a' : '1px solid #444'
+                  }}>
                     <div>
-                      <Text style={{ fontSize: 13 }}>{item.startTime} - {item.endTime}</Text>
-                      <Text type="secondary" style={{ fontSize: 10, marginLeft: 8 }}>{item.enrolled}/{item.capacity}</Text>
+                      <Text style={{ fontSize: 14, color: '#fff' }}>{item.startTime} - {item.endTime}</Text>
+                      <Text style={{ fontSize: 10, marginLeft: 8, color: '#888' }}>{item.enrolled}/{item.capacity}</Text>
                     </div>
                     {item.isEnrolled ? (
-                      <Button size="small" type="text" danger onClick={() => handleUnenroll(item.id)}>✕</Button>
+                      <Button size="small" danger onClick={() => handleUnenroll(item.id)}>Salir</Button>
                     ) : (
-                      <Button size="small" type="link" onClick={() => handleEnroll(item.id)} disabled={item.enrolled >= item.capacity || profile?.status !== 'active'}>
+                      <Button size="small" type="primary" onClick={() => handleEnroll(item.id)}
+                        disabled={item.enrolled >= item.capacity || profile?.status !== 'active'}>
                         Elegir
                       </Button>
                     )}
                   </div>
                 )) : (
-                  <Text type="secondary" style={{ fontSize: 11 }}>Sin turnos cargados</Text>
+                  <Text style={{ fontSize: 12, color: '#666' }}>Sin turnos cargados para este día</Text>
                 )}
               </div>
             )
