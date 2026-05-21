@@ -378,7 +378,7 @@ function ClientPortal() {
           <DollarOutlined style={{ fontSize: 24, color: '#2e7d32' }} />
           <Title level={5} style={{ margin: '8px 0 4px', color: '#2e7d32' }}>Pagá por transferencia</Title>
           <div style={{ background: '#fff', padding: '8px 16px', borderRadius: 8, display: 'inline-block', margin: '8px 0' }}>
-            <Text strong style={{ fontSize: 16, letterSpacing: 1 }}>ALIAS: POR DEFINIR</Text>
+            <Text strong style={{ fontSize: 16, letterSpacing: 1 }}>ALIAS: FEMMBOX93</Text>
           </div>
           <br />
           <Text style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 12 }}>
