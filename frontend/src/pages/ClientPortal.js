@@ -155,42 +155,92 @@ function ClientPortal() {
 
   const dayNames = { monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miércoles', thursday: 'Jueves', friday: 'Viernes', saturday: 'Sábado', sunday: 'Domingo' }
 
+  // Precios por cantidad de días
+  const pricing = [
+    { days: 1, price: 15000 },
+    { days: 2, price: 22000 },
+    { days: 3, price: 28000 },
+    { days: 4, price: 33000 },
+    { days: 5, price: 37000 }
+  ]
+
+  // Clases agrupadas por día
+  const classesByDay = {}
+  classes.forEach(c => {
+    const day = c.dayOfWeek || 'sin_dia'
+    if (!classesByDay[day]) classesByDay[day] = []
+    classesByDay[day].push(c)
+  })
+
+  // Contar en cuántos días está inscripta
+  const enrolledDays = new Set(classes.filter(c => c.isEnrolled).map(c => c.dayOfWeek)).size
+
+  // Verificar si pagó antes del 10 (para el sorteo)
+  const today = dayjs()
+  const paidBeforeTen = payments.some(p => {
+    const payDate = dayjs(p.paymentDate)
+    return payDate.month() === today.month() && payDate.year() === today.year() && payDate.date() <= 10
+  })
+
   const tabItems = [
     {
       key: 'classes',
       label: <span><CalendarOutlined /> Clases</span>,
       children: (
-        <List
-          dataSource={classes}
-          locale={{ emptyText: <Empty description="No hay clases disponibles" /> }}
-          renderItem={(item) => (
-            <Card size="small" style={{ marginBottom: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <Text strong>{item.name}</Text>
-                  <br />
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {dayNames[item.dayOfWeek] || item.dayOfWeek} {item.startTime}-{item.endTime} | {item.instructor}
-                  </Text>
-                  <br />
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {item.enrolled}/{item.capacity} inscriptas
-                  </Text>
-                </div>
-                <div>
-                  {item.isEnrolled ? (
-                    <Button size="small" danger onClick={() => handleUnenroll(item.id)}>Salir</Button>
-                  ) : (
-                    <Button size="small" type="primary" onClick={() => handleEnroll(item.id)}
-                      disabled={item.enrolled >= item.capacity || profile?.status !== 'active'}>
-                      Inscribirme
-                    </Button>
-                  )}
-                </div>
+        <div>
+          {/* Precios */}
+          <Card size="small" style={{ marginBottom: 12, background: '#f0f5ff' }}>
+            <Text strong style={{ display: 'block', marginBottom: 8 }}>💰 Precios por frecuencia:</Text>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {pricing.map(p => (
+                <Tag key={p.days} color={enrolledDays === p.days ? 'green' : 'default'} style={{ fontSize: 12 }}>
+                  {p.days}x sem: ${p.price.toLocaleString()}
+                </Tag>
+              ))}
+            </div>
+            {enrolledDays > 0 && (
+              <Text type="secondary" style={{ display: 'block', marginTop: 8, fontSize: 12 }}>
+                Estás inscripta en {enrolledDays} día{enrolledDays > 1 ? 's' : ''} por semana
+              </Text>
+            )}
+          </Card>
+
+          {/* Clases por día */}
+          {Object.keys(dayNames).map(day => {
+            const dayClasses = classesByDay[day]
+            if (!dayClasses || dayClasses.length === 0) return null
+            return (
+              <div key={day} style={{ marginBottom: 12 }}>
+                <Text strong style={{ fontSize: 13, color: '#e91e63' }}>{dayNames[day]}</Text>
+                {dayClasses.map(item => (
+                  <Card size="small" key={item.id} style={{ marginTop: 4, marginBottom: 4 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <Text>{item.name}</Text>
+                        <br />
+                        <Text type="secondary" style={{ fontSize: 11 }}>
+                          {item.startTime}-{item.endTime} | {item.instructor} | {item.enrolled}/{item.capacity}
+                        </Text>
+                      </div>
+                      <div>
+                        {item.isEnrolled ? (
+                          <Button size="small" danger onClick={() => handleUnenroll(item.id)}>Salir</Button>
+                        ) : (
+                          <Button size="small" type="primary" onClick={() => handleEnroll(item.id)}
+                            disabled={item.enrolled >= item.capacity || profile?.status !== 'active'}>
+                            Anotarme
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                ))}
               </div>
-            </Card>
-          )}
-        />
+            )
+          })}
+
+          {classes.length === 0 && <Empty description="No hay clases disponibles" />}
+        </div>
       )
     },
     {
@@ -278,6 +328,25 @@ function ClientPortal() {
             <Text type="danger">Acercate a renovar para seguir entrenando</Text>
           </div>
         )}
+      </Card>
+
+      {/* Sorteo mensual */}
+      <Card style={{ marginBottom: 12, borderRadius: 12, background: paidBeforeTen ? '#e8f5e9' : '#fff8e1', border: paidBeforeTen ? '1px solid #a5d6a7' : '1px solid #ffe082' }}>
+        <div style={{ textAlign: 'center' }}>
+          <Text style={{ fontSize: 20 }}>🎉</Text>
+          <Title level={5} style={{ margin: '4px 0', color: paidBeforeTen ? '#2e7d32' : '#f57f17' }}>
+            Sorteo Mensual
+          </Title>
+          {paidBeforeTen ? (
+            <Text style={{ color: '#2e7d32', fontSize: 13 }}>
+              <strong>¡Estás participando!</strong> Pagaste antes del 10, ya estás en el sorteo de este mes. ¡Mucha suerte! 🍀
+            </Text>
+          ) : (
+            <Text style={{ color: '#f57f17', fontSize: 13 }}>
+              Pagá tu cuota antes del <strong>día 10</strong> y participás del sorteo mensual que realiza la profe. ¡No te lo pierdas!
+            </Text>
+          )}
+        </div>
       </Card>
 
       {/* Tabs */}
