@@ -192,10 +192,10 @@ function ClientPortal() {
           </Card>
         </Col>
         <Col span={12}>
-          <Card size="small" style={{ borderRadius: 10, textAlign: 'center', height: '100%', background: paidBeforeTen ? '#e8f5e9' : '#fff8e1' }}>
-            <Text style={{ fontSize: 16 }}>🎉</Text>
+          <Card size="small" style={{ borderRadius: 10, textAlign: 'center', height: '100%', background: paidBeforeTen ? '#1a3a1a' : '#3a3000', border: paidBeforeTen ? '1px solid #52c41a' : '1px solid #d4a017' }}>
+            <Text style={{ fontSize: 16 }}>🎁</Text>
             <br />
-            <Text style={{ fontSize: 11, color: paidBeforeTen ? '#2e7d32' : '#f57f17' }}>
+            <Text style={{ fontSize: 11, color: paidBeforeTen ? '#52c41a' : '#d4a017' }}>
               {paidBeforeTen ? '¡En el sorteo!' : 'Pagá antes del 10'}
             </Text>
           </Card>
@@ -210,14 +210,14 @@ function ClientPortal() {
               size="small"
               style={{
                 borderRadius: 10, textAlign: 'center', cursor: 'pointer',
-                border: activeSection === s.key ? '2px solid #ff1493' : '1px solid #f0f0f0',
-                background: activeSection === s.key ? '#1a1a1a' : '#fff'
+                border: activeSection === s.key ? '2px solid #ff1493' : '1px solid #444',
+                background: activeSection === s.key ? '#3a1a2a' : '#2d2d2d'
               }}
               bodyStyle={{ padding: 8 }}
               onClick={() => setActiveSection(s.key)}
             >
-              <div style={{ fontSize: 18 }}>{s.icon}</div>
-              <Text style={{ fontSize: 10 }}>{s.label}</Text>
+              <div style={{ fontSize: 18, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.icon}</div>
+              <Text style={{ fontSize: 10, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.label}</Text>
             </Card>
           </Col>
         ))}
@@ -365,9 +365,9 @@ function ClientPortal() {
           {/* Sorteo */}
           <Card size="small" style={{ borderRadius: 12, marginBottom: 10, background: paidBeforeTen ? '#e8f5e9' : '#fff8e1' }}>
             <div style={{ textAlign: 'center' }}>
-              <Text style={{ fontSize: 24 }}>🎉</Text>
-              <Title level={5} style={{ margin: '4px 0', color: paidBeforeTen ? '#2e7d32' : '#f57f17' }}>Sorteo Mensual</Title>
-              <Text style={{ fontSize: 13, color: paidBeforeTen ? '#2e7d32' : '#f57f17' }}>
+              <Text style={{ fontSize: 24 }}>🎁</Text>
+              <Title level={5} style={{ margin: '4px 0', color: paidBeforeTen ? '#52c41a' : '#d4a017' }}>Sorteo Mensual</Title>
+              <Text style={{ fontSize: 13, color: paidBeforeTen ? '#52c41a' : '#d4a017' }}>
                 {paidBeforeTen ? '¡Estás participando! Pagaste antes del 10. Mucha suerte 🍀' : 'Pagá antes del día 10 y participás del sorteo de la profe. ¡No te lo pierdas!'}
               </Text>
             </div>
