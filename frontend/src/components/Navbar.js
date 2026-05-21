@@ -41,7 +41,7 @@ function Navbar() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        background: 'linear-gradient(90deg, #e91e63, #d81b60)',
+        background: 'linear-gradient(90deg, #ff1493, #c2185b)',
         padding: '0 12px',
         position: 'fixed',
         top: 0,

@@ -30,22 +30,23 @@ function Login() {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      background: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd0 50%, #f48fb1 100%)'
+      background: '#1a1a1a'
     }}>
       <Card style={{
         width: 400,
         borderRadius: 16,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-        border: 'none'
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+        border: 'none',
+        background: '#2a2a2a'
       }}>
         <div style={{ textAlign: 'center', marginBottom: 30 }}>
           <img
             src="/logobox.png"
             alt="FemmBox"
-            style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', marginBottom: 16, border: '3px solid #e91e63' }}
+            style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', marginBottom: 16, border: '3px solid #ff1493' }}
           />
-          <Title level={2} style={{ color: '#e91e63', marginBottom: 0 }}>FEMMBOX</Title>
-          <Text style={{ color: '#888' }}>Gestión de Gimnasio de Boxeo</Text>
+          <Title level={2} style={{ color: '#ff1493', marginBottom: 0 }}>FEMMBOX</Title>
+          <Text style={{ color: '#aaa' }}>Gestión de Gimnasio de Boxeo</Text>
         </div>
         <Form name="login" onFinish={onFinish} size="large">
           <Form.Item name="username" rules={[{ required: true, message: 'Ingrese usuario' }]}>

@@ -100,7 +100,7 @@ function Dashboard() {
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="inscritos" fill="#e91e63" />
+                  <Bar dataKey="inscritos" fill="#ff1493" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

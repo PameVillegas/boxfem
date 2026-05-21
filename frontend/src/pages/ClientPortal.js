@@ -96,12 +96,12 @@ function ClientPortal() {
   // LOGIN
   if (!isLoggedIn) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd0 50%, #f48fb1 100%)', padding: 16 }}>
-        <Card style={{ width: '100%', maxWidth: 380, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#1a1a1a', padding: 16 }}>
+        <Card style={{ width: '100%', maxWidth: 380, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.5)', background: '#2a2a2a', border: 'none' }}>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <img src="/logobox.png" alt="FemmBox" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #e91e63' }} />
-            <Title level={3} style={{ color: '#e91e63', marginTop: 12, marginBottom: 4 }}>FEMMBOX</Title>
-            <Text type="secondary">Portal de Alumnas</Text>
+            <img src="/logobox.png" alt="FemmBox" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #ff1493' }} />
+            <Title level={3} style={{ color: '#ff1493', marginTop: 12, marginBottom: 4 }}>FEMMBOX</Title>
+            <Text style={{ color: '#aaa' }}>Portal de Alumnas</Text>
           </div>
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Input size="large" prefix={<UserOutlined />} placeholder="Tu nombre" value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
@@ -167,12 +167,12 @@ function ClientPortal() {
   ]
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fce4ec', padding: 12 }}>
+    <div style={{ minHeight: '100vh', background: '#1a1a1a', padding: 12 }}>
       {/* Header */}
       <Card size="small" style={{ marginBottom: 10, borderRadius: 12 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <Title level={5} style={{ margin: 0, color: '#e91e63' }}>Hola {profile?.name}! 🥊</Title>
+            <Title level={5} style={{ margin: 0, color: '#ff1493' }}>Hola {profile?.name}! 🥊</Title>
             <Text style={{ fontSize: 12, color: '#666' }}>{currentPlan.label} {currentPlan.price > 0 && `— $${currentPlan.price.toLocaleString()}`}</Text>
           </div>
           <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout} danger size="small" />
@@ -210,8 +210,8 @@ function ClientPortal() {
               size="small"
               style={{
                 borderRadius: 10, textAlign: 'center', cursor: 'pointer',
-                border: activeSection === s.key ? '2px solid #e91e63' : '1px solid #f0f0f0',
-                background: activeSection === s.key ? '#fce4ec' : '#fff'
+                border: activeSection === s.key ? '2px solid #ff1493' : '1px solid #f0f0f0',
+                background: activeSection === s.key ? '#1a1a1a' : '#fff'
               }}
               bodyStyle={{ padding: 8 }}
               onClick={() => setActiveSection(s.key)}
@@ -226,7 +226,7 @@ function ClientPortal() {
       {/* Contenido de la sección activa */}
       {activeSection === 'horarios' && (
         <Card size="small" style={{ borderRadius: 12 }}>
-          <Title level={5} style={{ color: '#e91e63', marginBottom: 8 }}>Elegí tus días y horarios</Title>
+          <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>Elegí tus días y horarios</Title>
 
           {/* Resumen de inscripción */}
           {enrolledDays > 0 && (
@@ -254,7 +254,7 @@ function ClientPortal() {
             return (
               <div key={day} style={{ marginBottom: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <Text strong style={{ color: '#e91e63', fontSize: 13 }}>{dayNames[day]}</Text>
+                  <Text strong style={{ color: '#ff1493', fontSize: 13 }}>{dayNames[day]}</Text>
                   {isEnrolledInDay && <Tag color="green" style={{ fontSize: 10 }}>Inscripta</Tag>}
                 </div>
                 {dayClasses.length > 0 ? dayClasses.map(item => (
@@ -282,7 +282,7 @@ function ClientPortal() {
 
       {activeSection === 'pagos' && (
         <Card size="small" style={{ borderRadius: 12 }}>
-          <Title level={5} style={{ color: '#e91e63', marginBottom: 8 }}>Mis Pagos</Title>
+          <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>Mis Pagos</Title>
           <List
             dataSource={payments}
             locale={{ emptyText: <Empty description="Sin pagos registrados" /> }}
@@ -301,7 +301,7 @@ function ClientPortal() {
           />
 
           {/* Transferencia */}
-          <div style={{ marginTop: 16, textAlign: 'center', padding: 12, background: '#e8f5e9', borderRadius: 8 }}>
+          <div style={{ marginTop: 16, textAlign: 'center', padding: 12, background: '#1a3a1a', borderRadius: 8 }}>
             <Text strong style={{ color: '#2e7d32' }}>Alias: FEMMBOX93</Text>
             <br />
             <Button type="primary" size="small" style={{ marginTop: 8, background: '#25d366', borderColor: '#25d366' }} href={whatsappLink} target="_blank">
@@ -313,7 +313,7 @@ function ClientPortal() {
 
       {activeSection === 'asistencia' && (
         <Card size="small" style={{ borderRadius: 12 }}>
-          <Title level={5} style={{ color: '#e91e63', marginBottom: 8 }}>Mi Asistencia</Title>
+          <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>Mi Asistencia</Title>
           <List
             dataSource={attendance}
             locale={{ emptyText: <Empty description="Sin asistencias" /> }}
@@ -341,9 +341,9 @@ function ClientPortal() {
           </Card>
 
           {/* Boxeo */}
-          <Card size="small" style={{ borderRadius: 12, background: 'linear-gradient(135deg, #fce4ec, #f8bbd0)' }}>
-            <Title level={5} style={{ color: '#c2185b', marginBottom: 8 }}>🥊 ¿Por qué entrenar boxeo?</Title>
-            <Text style={{ fontSize: 12, color: '#4a148c' }}>
+          <Card size="small" style={{ borderRadius: 12, background: 'linear-gradient(135deg, #1a1a1a, #f8bbd0)' }}>
+            <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>🥊 ¿Por qué entrenar boxeo?</Title>
+            <Text style={{ fontSize: 12, color: '#ddd' }}>
               El boxeo mejora tu resistencia, tonifica todo el cuerpo, libera estrés y aumenta tu confianza. Cada sesión quemás entre 400 y 700 calorías. No importa tu nivel — acá crecemos juntas. 💪
             </Text>
           </Card>

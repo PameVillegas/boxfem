@@ -30,7 +30,7 @@ function AppContent() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       {user && <Navbar />}
-      <Content style={{ padding: '12px', marginTop: user ? 52 : 0, background: '#fce4ec', minHeight: 'calc(100vh - 100px)', overflow: 'hidden' }}>
+      <Content style={{ padding: '12px', marginTop: user ? 52 : 0, background: '#1a1a1a', minHeight: 'calc(100vh - 100px)', overflow: 'hidden' }}>
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
@@ -42,7 +42,7 @@ function AppContent() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Content>
-      <Footer style={{ textAlign: 'center', padding: '12px' }}>
+      <Footer style={{ textAlign: 'center', padding: '12px', background: '#1a1a1a', color: '#888' }}>
         FEMMBOX ©2026
       </Footer>
     </Layout>
@@ -55,10 +55,15 @@ function App() {
       locale={esES}
       theme={{
         token: {
-          colorPrimary: '#e91e63',
+          colorPrimary: '#ff1493',
+          colorBgBase: '#1a1a1a',
+          colorTextBase: '#ffffff',
+          colorBgContainer: '#2a2a2a',
+          colorBorder: '#444',
+          colorBgElevated: '#333',
           borderRadius: 8
         },
-        algorithm: theme.defaultAlgorithm
+        algorithm: theme.darkAlgorithm
       }}
     >
       <AuthProvider>
