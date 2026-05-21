@@ -187,11 +187,9 @@ function Clients() {
           </Form.Item>
           <Form.Item name="planName" label="Plan" rules={[{ required: true }]}>
             <Select placeholder="Seleccionar plan">
-              <Select.Option value="1 vez por semana">1 vez por semana</Select.Option>
-              <Select.Option value="2 veces por semana">2 veces por semana</Select.Option>
-              <Select.Option value="3 veces por semana">3 veces por semana</Select.Option>
-              <Select.Option value="4 veces por semana">4 veces por semana</Select.Option>
-              <Select.Option value="5 veces por semana">5 veces por semana</Select.Option>
+              <Select.Option value="2 veces por semana">2 veces por semana - $25.000</Select.Option>
+              <Select.Option value="3 veces por semana">3 veces por semana - $30.000</Select.Option>
+              <Select.Option value="Semana completa">Semana completa (L-M-V) - $35.000</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item name="expirationDate" label="Fecha Vencimiento" rules={[{ required: true }]}>
