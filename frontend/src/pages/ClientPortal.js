@@ -155,13 +155,18 @@ function ClientPortal() {
 
   const dayNames = { monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miércoles', thursday: 'Jueves', friday: 'Viernes', saturday: 'Sábado', sunday: 'Domingo' }
 
-  // Precios por cantidad de días
+  // Horarios fijos del gym
+  const schedule = {
+    monday: ['08:00-09:00', '09:00-10:00', '14:00-15:00', '15:00-16:00', '19:00-20:00', '20:00-21:00'],
+    wednesday: ['08:00-09:00', '09:00-10:00', '14:00-15:00', '15:00-16:00', '19:00-20:00'],
+    friday: ['08:00-09:00', '09:00-10:00', '14:00-15:00', '15:00-16:00', '19:00-20:00', '20:00-21:00']
+  }
+
+  // Precios
   const pricing = [
-    { days: 1, price: 15000 },
-    { days: 2, price: 22000 },
-    { days: 3, price: 28000 },
-    { days: 4, price: 33000 },
-    { days: 5, price: 37000 }
+    { days: 2, label: '2 veces por semana', price: 25000 },
+    { days: 3, label: '3 veces por semana', price: 30000 },
+    { days: 5, label: 'Semana completa (L-M-V)', price: 35000 }
   ]
 
   // Clases agrupadas por día
@@ -173,7 +178,11 @@ function ClientPortal() {
   })
 
   // Contar en cuántos días está inscripta
-  const enrolledDays = new Set(classes.filter(c => c.isEnrolled).map(c => c.dayOfWeek)).size
+  const enrolledClasses = classes.filter(c => c.isEnrolled)
+  const enrolledDays = new Set(enrolledClasses.map(c => c.dayOfWeek)).size
+
+  // Precio que le corresponde
+  const currentPrice = enrolledDays >= 3 ? 35000 : enrolledDays === 2 ? 25000 : enrolledDays === 1 ? 25000 : 0
 
   // Verificar si pagó antes del 10 (para el sorteo)
   const today = dayjs()
@@ -182,44 +191,55 @@ function ClientPortal() {
     return payDate.month() === today.month() && payDate.year() === today.year() && payDate.date() <= 10
   })
 
+  const whatsappLink = `https://wa.me/5493388414420?text=${encodeURIComponent('Hola! Te envío mi comprobante de pago 🧾')}`
+
   const tabItems = [
     {
       key: 'classes',
-      label: <span><CalendarOutlined /> Clases</span>,
+      label: <span><CalendarOutlined /> Horarios</span>,
       children: (
         <div>
           {/* Precios */}
           <Card size="small" style={{ marginBottom: 12, background: '#f0f5ff' }}>
-            <Text strong style={{ display: 'block', marginBottom: 8 }}>💰 Precios por frecuencia:</Text>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {pricing.map(p => (
-                <Tag key={p.days} color={enrolledDays === p.days ? 'green' : 'default'} style={{ fontSize: 12 }}>
-                  {p.days}x sem: ${p.price.toLocaleString()}
+            <Text strong style={{ display: 'block', marginBottom: 8 }}>💰 Cuotas:</Text>
+            {pricing.map(p => (
+              <div key={p.days} style={{ marginBottom: 4 }}>
+                <Tag color={enrolledDays === p.days || (enrolledDays >= 3 && p.days === 5) ? 'green' : 'default'} style={{ fontSize: 13 }}>
+                  {p.label}: <strong>${p.price.toLocaleString()}</strong>
                 </Tag>
-              ))}
-            </div>
+              </div>
+            ))}
             {enrolledDays > 0 && (
-              <Text type="secondary" style={{ display: 'block', marginTop: 8, fontSize: 12 }}>
-                Estás inscripta en {enrolledDays} día{enrolledDays > 1 ? 's' : ''} por semana
+              <Text style={{ display: 'block', marginTop: 8, fontSize: 12, color: '#389e0d' }}>
+                ✓ Estás anotada en {enrolledDays} día{enrolledDays > 1 ? 's' : ''} — Tu cuota: <strong>${currentPrice.toLocaleString()}</strong>
               </Text>
             )}
           </Card>
 
-          {/* Clases por día */}
-          {Object.keys(dayNames).map(day => {
+          {/* Horarios por día */}
+          {['monday', 'wednesday', 'friday'].map(day => {
             const dayClasses = classesByDay[day]
-            if (!dayClasses || dayClasses.length === 0) return null
+            if (!dayClasses || dayClasses.length === 0) return (
+              <div key={day} style={{ marginBottom: 12 }}>
+                <Text strong style={{ fontSize: 14, color: '#e91e63' }}>{dayNames[day]}</Text>
+                <Card size="small" style={{ marginTop: 4 }}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>Horarios: {schedule[day].join(' | ')}</Text>
+                  <br />
+                  <Text type="secondary" style={{ fontSize: 11 }}>No hay turnos cargados aún</Text>
+                </Card>
+              </div>
+            )
             return (
               <div key={day} style={{ marginBottom: 12 }}>
-                <Text strong style={{ fontSize: 13, color: '#e91e63' }}>{dayNames[day]}</Text>
+                <Text strong style={{ fontSize: 14, color: '#e91e63' }}>{dayNames[day]}</Text>
                 {dayClasses.map(item => (
-                  <Card size="small" key={item.id} style={{ marginTop: 4, marginBottom: 4 }}>
+                  <Card size="small" key={item.id} style={{ marginTop: 4 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <Text>{item.name}</Text>
+                        <Text style={{ fontSize: 13 }}>{item.startTime} - {item.endTime}</Text>
                         <br />
                         <Text type="secondary" style={{ fontSize: 11 }}>
-                          {item.startTime}-{item.endTime} | {item.instructor} | {item.enrolled}/{item.capacity}
+                          {item.name} | {item.enrolled}/{item.capacity} alumnas
                         </Text>
                       </div>
                       <div>
@@ -238,8 +258,6 @@ function ClientPortal() {
               </div>
             )
           })}
-
-          {classes.length === 0 && <Empty description="No hay clases disponibles" />}
         </div>
       )
     },
@@ -354,6 +372,31 @@ function ClientPortal() {
         <Tabs items={tabItems} defaultActiveKey="classes" />
       </Card>
 
+      {/* Pago por transferencia + WhatsApp */}
+      <Card style={{ marginTop: 12, borderRadius: 12, background: '#e8f5e9', border: '1px solid #a5d6a7' }}>
+        <div style={{ textAlign: 'center' }}>
+          <DollarOutlined style={{ fontSize: 24, color: '#2e7d32' }} />
+          <Title level={5} style={{ margin: '8px 0 4px', color: '#2e7d32' }}>Pagá por transferencia</Title>
+          <div style={{ background: '#fff', padding: '8px 16px', borderRadius: 8, display: 'inline-block', margin: '8px 0' }}>
+            <Text strong style={{ fontSize: 16, letterSpacing: 1 }}>ALIAS: POR DEFINIR</Text>
+          </div>
+          <br />
+          <Text style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 12 }}>
+            Después de transferir, enviá el comprobante por WhatsApp:
+          </Text>
+          <Button
+            type="primary"
+            size="large"
+            style={{ background: '#25d366', borderColor: '#25d366', fontWeight: 'bold' }}
+            href={whatsappLink}
+            target="_blank"
+            block
+          >
+            📲 Enviar Comprobante por WhatsApp
+          </Button>
+        </div>
+      </Card>
+
       {/* Recordatorio de pagos */}
       <Card style={{ marginTop: 12, borderRadius: 12, background: '#fff3e0', border: '1px solid #ffe0b2' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
@@ -362,7 +405,7 @@ function ClientPortal() {
             <Text strong style={{ color: '#e65100' }}>Recordá mantener tu cuota al día</Text>
             <br />
             <Text style={{ fontSize: 13, color: '#bf360c' }}>
-              Abonando antes del día 10 evitás el recargo del 10%. Podés pagar en efectivo, transferencia o MercadoPago.
+              Abonando antes del día 10 evitás el recargo del 10% y participás del sorteo mensual.
             </Text>
           </div>
         </div>
