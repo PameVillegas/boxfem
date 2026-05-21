@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Typography, Input, Button, message, Tag, List, Tabs, Space, Spin, Empty, Badge } from 'antd'
-import { UserOutlined, PhoneOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined } from '@ant-design/icons'
+import { Card, Typography, Input, Button, message, Tag, List, Space, Spin, Empty, Row, Col, Alert } from 'antd'
+import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined } from '@ant-design/icons'
 import { portalAPI } from '../services/api'
 import dayjs from 'dayjs'
 
@@ -9,7 +9,7 @@ const { Title, Text } = Typography
 function ClientPortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [phone, setPhone] = useState('')
+  const [nameInput, setNameInput] = useState('')
   const [lastName, setLastName] = useState('')
   const [code, setCode] = useState('')
   const [profile, setProfile] = useState(null)
@@ -17,6 +17,7 @@ function ClientPortal() {
   const [classes, setClasses] = useState([])
   const [attendance, setAttendance] = useState([])
   const [dataLoading, setDataLoading] = useState(false)
+  const [activeSection, setActiveSection] = useState('horarios')
 
   useEffect(() => {
     const token = localStorage.getItem('clientToken')
@@ -27,10 +28,10 @@ function ClientPortal() {
   }, [])
 
   const handleLogin = async () => {
-    if (!phone || !lastName || !code) return message.warning('Completá todos los campos')
+    if (!nameInput || !lastName || !code) return message.warning('Completá todos los campos')
     setLoading(true)
     try {
-      const res = await portalAPI.login(phone, lastName, code)
+      const res = await portalAPI.login(nameInput, lastName, code)
       localStorage.setItem('clientToken', res.data.token)
       setProfile(res.data.client)
       setIsLoggedIn(true)
@@ -58,9 +59,7 @@ function ClientPortal() {
       setClasses(classesRes.data)
       setAttendance(attendanceRes.data)
     } catch (error) {
-      if (error.response?.status === 401) {
-        handleLogout()
-      }
+      if (error.response?.status === 401) handleLogout()
     } finally {
       setDataLoading(false)
     }
@@ -76,7 +75,7 @@ function ClientPortal() {
     try {
       const config = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }
       await portalAPI.enroll(classId, config)
-      message.success('Te inscribiste!')
+      message.success('Te anotaste!')
       loadData()
     } catch (error) {
       message.error(error.response?.data?.error || 'Error')
@@ -87,7 +86,7 @@ function ClientPortal() {
     try {
       const config = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }
       await portalAPI.unenroll(classId, config)
-      message.success('Te desinscribiste')
+      message.success('Te saliste del turno')
       loadData()
     } catch (error) {
       message.error(error.response?.data?.error || 'Error')
@@ -97,14 +96,7 @@ function ClientPortal() {
   // LOGIN
   if (!isLoggedIn) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd0 50%, #f48fb1 100%)',
-        padding: 16
-      }}>
+      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd0 50%, #f48fb1 100%)', padding: 16 }}>
         <Card style={{ width: '100%', maxWidth: 380, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
             <img src="/logobox.png" alt="FemmBox" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #e91e63' }} />
@@ -112,35 +104,12 @@ function ClientPortal() {
             <Text type="secondary">Portal de Alumnas</Text>
           </div>
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <Input
-              size="large"
-              prefix={<UserOutlined />}
-              placeholder="Tu nombre"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-            <Input
-              size="large"
-              prefix={<UserOutlined />}
-              placeholder="Tu apellido"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-            <Input.Password
-              size="large"
-              prefix={<LockOutlined />}
-              placeholder="Tu código personal"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              onPressEnter={handleLogin}
-            />
-            <Button type="primary" size="large" block onClick={handleLogin} loading={loading}>
-              Entrar
-            </Button>
+            <Input size="large" prefix={<UserOutlined />} placeholder="Tu nombre" value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
+            <Input size="large" prefix={<UserOutlined />} placeholder="Tu apellido" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            <Input.Password size="large" prefix={<LockOutlined />} placeholder="Tu código personal" value={code} onChange={(e) => setCode(e.target.value)} onPressEnter={handleLogin} />
+            <Button type="primary" size="large" block onClick={handleLogin} loading={loading}>Entrar</Button>
           </Space>
-          <Text type="secondary" style={{ display: 'block', textAlign: 'center', marginTop: 16, fontSize: 12 }}>
-            Tu código te lo da la recepción del gym
-          </Text>
+          <Text type="secondary" style={{ display: 'block', textAlign: 'center', marginTop: 16, fontSize: 12 }}>Tu código te lo da la recepción del gym</Text>
         </Card>
       </div>
     )
@@ -153,21 +122,31 @@ function ClientPortal() {
   const statusText = profile?.status === 'active' ? 'Al día' : 'Vencida'
   const daysLeft = profile?.expirationDate ? dayjs(profile.expirationDate).diff(dayjs(), 'day') : 0
 
-  const dayNames = { monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miércoles', thursday: 'Jueves', friday: 'Viernes', saturday: 'Sábado', sunday: 'Domingo' }
+  // Días inscriptos
+  const enrolledClasses = classes.filter(c => c.isEnrolled)
+  const enrolledDaySet = new Set(enrolledClasses.map(c => c.dayOfWeek))
+  const enrolledDays = enrolledDaySet.size
 
-  // Horarios fijos del gym
-  const schedule = {
-    monday: ['08:00-09:00', '09:00-10:00', '14:00-15:00', '15:00-16:00', '19:00-20:00', '20:00-21:00'],
-    wednesday: ['08:00-09:00', '09:00-10:00', '14:00-15:00', '15:00-16:00', '19:00-20:00'],
-    friday: ['08:00-09:00', '09:00-10:00', '14:00-15:00', '15:00-16:00', '19:00-20:00', '20:00-21:00']
+  // Plan actual según días inscriptos
+  const getPlan = (days) => {
+    if (days >= 3) return { label: 'Semana completa (L-M-V)', price: 35000 }
+    if (days === 2) return { label: '2 veces por semana', price: 25000 }
+    if (days === 1) return { label: '1 vez por semana', price: 25000 }
+    return { label: 'Sin plan', price: 0 }
   }
+  const currentPlan = getPlan(enrolledDays)
 
-  // Precios
-  const pricing = [
-    { days: 2, label: '2 veces por semana', price: 25000 },
-    { days: 3, label: '3 veces por semana', price: 30000 },
-    { days: 5, label: 'Semana completa (L-M-V)', price: 35000 }
-  ]
+  // Detectar cambio de plan
+  const previousPlan = getPlan(enrolledDays) // se actualiza en tiempo real al inscribirse
+
+  // Sorteo
+  const today = dayjs()
+  const paidBeforeTen = payments.some(p => {
+    const payDate = dayjs(p.paymentDate)
+    return payDate.month() === today.month() && payDate.year() === today.year() && payDate.date() <= 10
+  })
+
+  const whatsappLink = `https://wa.me/5493388414420?text=${encodeURIComponent('Hola! Te envío mi comprobante de pago 🧾')}`
 
   // Clases agrupadas por día
   const classesByDay = {}
@@ -177,249 +156,199 @@ function ClientPortal() {
     classesByDay[day].push(c)
   })
 
-  // Contar en cuántos días está inscripta
-  const enrolledClasses = classes.filter(c => c.isEnrolled)
-  const enrolledDays = new Set(enrolledClasses.map(c => c.dayOfWeek)).size
+  const dayNames = { monday: 'Lunes', wednesday: 'Miércoles', friday: 'Viernes' }
 
-  // Precio que le corresponde
-  const currentPrice = enrolledDays >= 3 ? 35000 : enrolledDays === 2 ? 25000 : enrolledDays === 1 ? 25000 : 0
-
-  // Verificar si pagó antes del 10 (para el sorteo)
-  const today = dayjs()
-  const paidBeforeTen = payments.some(p => {
-    const payDate = dayjs(p.paymentDate)
-    return payDate.month() === today.month() && payDate.year() === today.year() && payDate.date() <= 10
-  })
-
-  const whatsappLink = `https://wa.me/5493388414420?text=${encodeURIComponent('Hola! Te envío mi comprobante de pago 🧾')}`
-
-  const tabItems = [
-    {
-      key: 'classes',
-      label: <span><CalendarOutlined /> Horarios</span>,
-      children: (
-        <div>
-          {/* Precios */}
-          <Card size="small" style={{ marginBottom: 12, background: '#f0f5ff' }}>
-            <Text strong style={{ display: 'block', marginBottom: 8 }}>💰 Cuotas:</Text>
-            {pricing.map(p => (
-              <div key={p.days} style={{ marginBottom: 4 }}>
-                <Tag color={enrolledDays === p.days || (enrolledDays >= 3 && p.days === 5) ? 'green' : 'default'} style={{ fontSize: 13 }}>
-                  {p.label}: <strong>${p.price.toLocaleString()}</strong>
-                </Tag>
-              </div>
-            ))}
-            {enrolledDays > 0 && (
-              <Text style={{ display: 'block', marginTop: 8, fontSize: 12, color: '#389e0d' }}>
-                ✓ Estás anotada en {enrolledDays} día{enrolledDays > 1 ? 's' : ''} — Tu cuota: <strong>${currentPrice.toLocaleString()}</strong>
-              </Text>
-            )}
-          </Card>
-
-          {/* Horarios por día */}
-          {['monday', 'wednesday', 'friday'].map(day => {
-            const dayClasses = classesByDay[day]
-            if (!dayClasses || dayClasses.length === 0) return (
-              <div key={day} style={{ marginBottom: 12 }}>
-                <Text strong style={{ fontSize: 14, color: '#e91e63' }}>{dayNames[day]}</Text>
-                <Card size="small" style={{ marginTop: 4 }}>
-                  <Text type="secondary" style={{ fontSize: 12 }}>Horarios: {schedule[day].join(' | ')}</Text>
-                  <br />
-                  <Text type="secondary" style={{ fontSize: 11 }}>No hay turnos cargados aún</Text>
-                </Card>
-              </div>
-            )
-            return (
-              <div key={day} style={{ marginBottom: 12 }}>
-                <Text strong style={{ fontSize: 14, color: '#e91e63' }}>{dayNames[day]}</Text>
-                {dayClasses.map(item => (
-                  <Card size="small" key={item.id} style={{ marginTop: 4 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <Text style={{ fontSize: 13 }}>{item.startTime} - {item.endTime}</Text>
-                        <br />
-                        <Text type="secondary" style={{ fontSize: 11 }}>
-                          {item.name} | {item.enrolled}/{item.capacity} alumnas
-                        </Text>
-                      </div>
-                      <div>
-                        {item.isEnrolled ? (
-                          <Button size="small" danger onClick={() => handleUnenroll(item.id)}>Salir</Button>
-                        ) : (
-                          <Button size="small" type="primary" onClick={() => handleEnroll(item.id)}
-                            disabled={item.enrolled >= item.capacity || profile?.status !== 'active'}>
-                            Anotarme
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )
-          })}
-        </div>
-      )
-    },
-    {
-      key: 'payments',
-      label: <span><DollarOutlined /> Pagos</span>,
-      children: (
-        <List
-          dataSource={payments}
-          locale={{ emptyText: <Empty description="Sin pagos registrados" /> }}
-          renderItem={(item) => (
-            <Card size="small" style={{ marginBottom: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <Text strong>${item.amount}</Text>
-                  <br />
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {dayjs(item.paymentDate).format('DD/MM/YYYY')} - {item.paymentMethod}
-                  </Text>
-                </div>
-                <Tag color={item.status === 'paid' ? 'green' : 'orange'}>
-                  {item.status === 'paid' ? 'Pagado' : 'Pendiente'}
-                </Tag>
-              </div>
-            </Card>
-          )}
-        />
-      )
-    },
-    {
-      key: 'attendance',
-      label: <span><CheckCircleOutlined /> Asistencia</span>,
-      children: (
-        <List
-          dataSource={attendance}
-          locale={{ emptyText: <Empty description="Sin asistencias" /> }}
-          renderItem={(item) => (
-            <Card size="small" style={{ marginBottom: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <Text>{dayjs(item.date).format('DD/MM/YYYY')}</Text>
-                  <br />
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {item.Class?.name || 'Clase general'} - {dayjs(item.checkInTime).format('HH:mm')}hs
-                  </Text>
-                </div>
-                <CheckCircleOutlined style={{ color: 'green', fontSize: 18 }} />
-              </div>
-            </Card>
-          )}
-        />
-      )
-    }
+  // Secciones del menú
+  const sections = [
+    { key: 'horarios', icon: <CalendarOutlined />, label: 'Horarios' },
+    { key: 'pagos', icon: <DollarOutlined />, label: 'Pagos' },
+    { key: 'asistencia', icon: <CheckCircleOutlined />, label: 'Asistencia' },
+    { key: 'info', icon: <ClockCircleOutlined />, label: 'Info' }
   ]
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fce4ec', padding: 16 }}>
+    <div style={{ minHeight: '100vh', background: '#fce4ec', padding: 12 }}>
       {/* Header */}
-      <Card style={{ marginBottom: 12, borderRadius: 12 }}>
+      <Card size="small" style={{ marginBottom: 10, borderRadius: 12 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <Title level={4} style={{ margin: 0, color: '#e91e63' }}>
-              Hola {profile?.name}! 🥊
-            </Title>
-            <Text type="secondary">{profile?.planName || 'Sin plan'}</Text>
+            <Title level={5} style={{ margin: 0, color: '#e91e63' }}>Hola {profile?.name}! 🥊</Title>
+            <Text style={{ fontSize: 12, color: '#666' }}>{currentPlan.label} {currentPlan.price > 0 && `— $${currentPlan.price.toLocaleString()}`}</Text>
           </div>
-          <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout} danger />
+          <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout} danger size="small" />
         </div>
       </Card>
 
-      {/* Estado de cuota */}
-      <Card style={{ marginBottom: 12, borderRadius: 12, textAlign: 'center' }}>
-        <Tag color={statusColor} style={{ fontSize: 14, padding: '4px 16px' }}>
-          Cuota: {statusText}
-        </Tag>
-        {profile?.status === 'active' && (
-          <div style={{ marginTop: 8 }}>
-            <Text type="secondary">
-              <ClockCircleOutlined /> Vence el {dayjs(profile.expirationDate).format('DD/MM/YYYY')}
-              {daysLeft <= 5 && daysLeft > 0 && <Text type="warning"> ({daysLeft} días)</Text>}
-            </Text>
-          </div>
-        )}
-        {profile?.status === 'expired' && (
-          <div style={{ marginTop: 8 }}>
-            <Text type="danger">Acercate a renovar para seguir entrenando</Text>
-          </div>
-        )}
-      </Card>
-
-      {/* Sorteo mensual */}
-      <Card style={{ marginBottom: 12, borderRadius: 12, background: paidBeforeTen ? '#e8f5e9' : '#fff8e1', border: paidBeforeTen ? '1px solid #a5d6a7' : '1px solid #ffe082' }}>
-        <div style={{ textAlign: 'center' }}>
-          <Text style={{ fontSize: 20 }}>🎉</Text>
-          <Title level={5} style={{ margin: '4px 0', color: paidBeforeTen ? '#2e7d32' : '#f57f17' }}>
-            Sorteo Mensual
-          </Title>
-          {paidBeforeTen ? (
-            <Text style={{ color: '#2e7d32', fontSize: 13 }}>
-              <strong>¡Estás participando!</strong> Pagaste antes del 10, ya estás en el sorteo de este mes. ¡Mucha suerte! 🍀
-            </Text>
-          ) : (
-            <Text style={{ color: '#f57f17', fontSize: 13 }}>
-              Pagá tu cuota antes del <strong>día 10</strong> y participás del sorteo mensual que realiza la profe. ¡No te lo pierdas!
-            </Text>
-          )}
-        </div>
-      </Card>
-
-      {/* Tabs */}
-      <Card style={{ borderRadius: 12 }}>
-        <Tabs items={tabItems} defaultActiveKey="classes" />
-      </Card>
-
-      {/* Pago por transferencia + WhatsApp */}
-      <Card style={{ marginTop: 12, borderRadius: 12, background: '#e8f5e9', border: '1px solid #a5d6a7' }}>
-        <div style={{ textAlign: 'center' }}>
-          <DollarOutlined style={{ fontSize: 24, color: '#2e7d32' }} />
-          <Title level={5} style={{ margin: '8px 0 4px', color: '#2e7d32' }}>Pagá por transferencia</Title>
-          <div style={{ background: '#fff', padding: '8px 16px', borderRadius: 8, display: 'inline-block', margin: '8px 0' }}>
-            <Text strong style={{ fontSize: 16, letterSpacing: 1 }}>ALIAS: FEMMBOX93</Text>
-          </div>
-          <br />
-          <Text style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 12 }}>
-            Después de transferir, enviá el comprobante por WhatsApp:
-          </Text>
-          <Button
-            type="primary"
-            size="large"
-            style={{ background: '#25d366', borderColor: '#25d366', fontWeight: 'bold' }}
-            href={whatsappLink}
-            target="_blank"
-            block
-          >
-            📲 Enviar Comprobante por WhatsApp
-          </Button>
-        </div>
-      </Card>
-
-      {/* Recordatorio de pagos */}
-      <Card style={{ marginTop: 12, borderRadius: 12, background: '#fff3e0', border: '1px solid #ffe0b2' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-          <DollarOutlined style={{ fontSize: 24, color: '#f57c00', marginTop: 2 }} />
-          <div>
-            <Text strong style={{ color: '#e65100' }}>Recordá mantener tu cuota al día</Text>
+      {/* Estado + Sorteo en grid */}
+      <Row gutter={[8, 8]} style={{ marginBottom: 10 }}>
+        <Col span={12}>
+          <Card size="small" style={{ borderRadius: 10, textAlign: 'center', height: '100%' }}>
+            <Tag color={statusColor} style={{ fontSize: 12 }}>Cuota: {statusText}</Tag>
+            {profile?.status === 'active' && (
+              <div style={{ marginTop: 4 }}>
+                <Text style={{ fontSize: 11, color: '#888' }}>Vence {dayjs(profile.expirationDate).format('DD/MM')}</Text>
+              </div>
+            )}
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card size="small" style={{ borderRadius: 10, textAlign: 'center', height: '100%', background: paidBeforeTen ? '#e8f5e9' : '#fff8e1' }}>
+            <Text style={{ fontSize: 16 }}>🎉</Text>
             <br />
-            <Text style={{ fontSize: 13, color: '#bf360c' }}>
-              Abonando antes del día 10 evitás el recargo del 10% y participás del sorteo mensual.
+            <Text style={{ fontSize: 11, color: paidBeforeTen ? '#2e7d32' : '#f57f17' }}>
+              {paidBeforeTen ? '¡En el sorteo!' : 'Pagá antes del 10'}
             </Text>
-          </div>
-        </div>
-      </Card>
+          </Card>
+        </Col>
+      </Row>
 
-      {/* Info sobre boxeo */}
-      <Card style={{ marginTop: 12, borderRadius: 12, background: 'linear-gradient(135deg, #fce4ec, #f8bbd0)' }}>
-        <Title level={5} style={{ color: '#c2185b', marginBottom: 8 }}>🥊 ¿Por qué entrenar boxeo?</Title>
-        <Text style={{ fontSize: 13, color: '#4a148c' }}>
-          El boxeo es uno de los entrenamientos más completos que existen. Mejora tu resistencia cardiovascular, 
-          tonifica todo el cuerpo, libera estrés y aumenta tu confianza. Cada sesión quemás entre 400 y 700 calorías 
-          mientras desarrollás coordinación, reflejos y fuerza mental. No importa tu nivel — acá crecemos juntas. 💪
-        </Text>
-      </Card>
+      {/* Navegación por secciones - cuadrícula */}
+      <Row gutter={[8, 8]} style={{ marginBottom: 10 }}>
+        {sections.map(s => (
+          <Col span={6} key={s.key}>
+            <Card
+              size="small"
+              style={{
+                borderRadius: 10, textAlign: 'center', cursor: 'pointer',
+                border: activeSection === s.key ? '2px solid #e91e63' : '1px solid #f0f0f0',
+                background: activeSection === s.key ? '#fce4ec' : '#fff'
+              }}
+              bodyStyle={{ padding: 8 }}
+              onClick={() => setActiveSection(s.key)}
+            >
+              <div style={{ fontSize: 18 }}>{s.icon}</div>
+              <Text style={{ fontSize: 10 }}>{s.label}</Text>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+
+      {/* Contenido de la sección activa */}
+      {activeSection === 'horarios' && (
+        <Card size="small" style={{ borderRadius: 12 }}>
+          <Title level={5} style={{ color: '#e91e63', marginBottom: 8 }}>Elegí tus días y horarios</Title>
+
+          {/* Resumen de inscripción */}
+          {enrolledDays > 0 && (
+            <Alert
+              type="success"
+              showIcon
+              style={{ marginBottom: 12 }}
+              message={<span>Estás en <strong>{enrolledDays} día{enrolledDays > 1 ? 's' : ''}</strong> — Plan: <strong>{currentPlan.label}</strong> (${currentPlan.price.toLocaleString()})</span>}
+              description={enrolledDays === 1 ? 'Si te anotás en otro día, tu plan pasa a 2 veces ($25.000)' : enrolledDays === 2 ? 'Si te anotás en un día más, tu plan pasa a semana completa ($35.000). Diferencia: $10.000' : null}
+            />
+          )}
+
+          {/* Cuotas */}
+          <div style={{ marginBottom: 12, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <Tag color={enrolledDays === 2 ? 'green' : 'default'}>2x sem: $25.000</Tag>
+            <Tag color={enrolledDays === 3 ? 'green' : 'default'}>3x sem: $30.000</Tag>
+            <Tag color={enrolledDays >= 3 ? 'green' : 'default'}>Completa: $35.000</Tag>
+          </div>
+
+          {/* Días */}
+          {['monday', 'wednesday', 'friday'].map(day => {
+            const dayClasses = (classesByDay[day] || []).sort((a, b) => a.startTime.localeCompare(b.startTime))
+            const isEnrolledInDay = enrolledClasses.some(c => c.dayOfWeek === day)
+
+            return (
+              <div key={day} style={{ marginBottom: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <Text strong style={{ color: '#e91e63', fontSize: 13 }}>{dayNames[day]}</Text>
+                  {isEnrolledInDay && <Tag color="green" style={{ fontSize: 10 }}>Inscripta</Tag>}
+                </div>
+                {dayClasses.length > 0 ? dayClasses.map(item => (
+                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 8px', background: item.isEnrolled ? '#f6ffed' : '#fafafa', borderRadius: 6, marginBottom: 4, border: item.isEnrolled ? '1px solid #b7eb8f' : '1px solid #f0f0f0' }}>
+                    <div>
+                      <Text style={{ fontSize: 13 }}>{item.startTime} - {item.endTime}</Text>
+                      <Text type="secondary" style={{ fontSize: 10, marginLeft: 8 }}>{item.enrolled}/{item.capacity}</Text>
+                    </div>
+                    {item.isEnrolled ? (
+                      <Button size="small" type="text" danger onClick={() => handleUnenroll(item.id)}>✕</Button>
+                    ) : (
+                      <Button size="small" type="link" onClick={() => handleEnroll(item.id)} disabled={item.enrolled >= item.capacity || profile?.status !== 'active'}>
+                        Elegir
+                      </Button>
+                    )}
+                  </div>
+                )) : (
+                  <Text type="secondary" style={{ fontSize: 11 }}>Sin turnos cargados</Text>
+                )}
+              </div>
+            )
+          })}
+        </Card>
+      )}
+
+      {activeSection === 'pagos' && (
+        <Card size="small" style={{ borderRadius: 12 }}>
+          <Title level={5} style={{ color: '#e91e63', marginBottom: 8 }}>Mis Pagos</Title>
+          <List
+            dataSource={payments}
+            locale={{ emptyText: <Empty description="Sin pagos registrados" /> }}
+            renderItem={(item) => (
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f5f5f5' }}>
+                <div>
+                  <Text strong>${item.amount}</Text>
+                  <br />
+                  <Text type="secondary" style={{ fontSize: 11 }}>{dayjs(item.paymentDate).format('DD/MM/YYYY')}</Text>
+                </div>
+                <Tag color={item.status === 'paid' ? 'green' : 'orange'} style={{ height: 'fit-content' }}>
+                  {item.status === 'paid' ? 'Pagado' : 'Pendiente'}
+                </Tag>
+              </div>
+            )}
+          />
+
+          {/* Transferencia */}
+          <div style={{ marginTop: 16, textAlign: 'center', padding: 12, background: '#e8f5e9', borderRadius: 8 }}>
+            <Text strong style={{ color: '#2e7d32' }}>Alias: FEMMBOX93</Text>
+            <br />
+            <Button type="primary" size="small" style={{ marginTop: 8, background: '#25d366', borderColor: '#25d366' }} href={whatsappLink} target="_blank">
+              📲 Enviar Comprobante
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {activeSection === 'asistencia' && (
+        <Card size="small" style={{ borderRadius: 12 }}>
+          <Title level={5} style={{ color: '#e91e63', marginBottom: 8 }}>Mi Asistencia</Title>
+          <List
+            dataSource={attendance}
+            locale={{ emptyText: <Empty description="Sin asistencias" /> }}
+            renderItem={(item) => (
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f5f5f5' }}>
+                <Text style={{ fontSize: 13 }}>{dayjs(item.date).format('DD/MM/YYYY')} — {item.Class?.name || 'Clase'}</Text>
+                <CheckCircleOutlined style={{ color: 'green' }} />
+              </div>
+            )}
+          />
+        </Card>
+      )}
+
+      {activeSection === 'info' && (
+        <div>
+          {/* Sorteo */}
+          <Card size="small" style={{ borderRadius: 12, marginBottom: 10, background: paidBeforeTen ? '#e8f5e9' : '#fff8e1' }}>
+            <div style={{ textAlign: 'center' }}>
+              <Text style={{ fontSize: 24 }}>🎉</Text>
+              <Title level={5} style={{ margin: '4px 0', color: paidBeforeTen ? '#2e7d32' : '#f57f17' }}>Sorteo Mensual</Title>
+              <Text style={{ fontSize: 13, color: paidBeforeTen ? '#2e7d32' : '#f57f17' }}>
+                {paidBeforeTen ? '¡Estás participando! Pagaste antes del 10. Mucha suerte 🍀' : 'Pagá antes del día 10 y participás del sorteo de la profe. ¡No te lo pierdas!'}
+              </Text>
+            </div>
+          </Card>
+
+          {/* Boxeo */}
+          <Card size="small" style={{ borderRadius: 12, background: 'linear-gradient(135deg, #fce4ec, #f8bbd0)' }}>
+            <Title level={5} style={{ color: '#c2185b', marginBottom: 8 }}>🥊 ¿Por qué entrenar boxeo?</Title>
+            <Text style={{ fontSize: 12, color: '#4a148c' }}>
+              El boxeo mejora tu resistencia, tonifica todo el cuerpo, libera estrés y aumenta tu confianza. Cada sesión quemás entre 400 y 700 calorías. No importa tu nivel — acá crecemos juntas. 💪
+            </Text>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
