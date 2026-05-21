@@ -92,9 +92,8 @@ function Classes() {
 
   const columns = [
     { title: 'Clase', dataIndex: 'name', ellipsis: true },
-    { title: 'Tipo', dataIndex: 'type', render: (t) => <Tag>{typeLabels[t] || t}</Tag>, responsive: ['md'] },
-    { title: 'Día', dataIndex: 'dayOfWeek', render: (d) => dayLabels[d] || d || '-', responsive: ['md'] },
-    { title: 'Horario', key: 'time', render: (_, r) => `${r.startTime}-${r.endTime}`, width: 100 },
+    { title: 'Dia', dataIndex: 'dayOfWeek', render: (d) => dayLabels[d] || d || '-', width: 80 },
+    { title: 'Horario', key: 'time', render: (_, r) => `${r.startTime}-${r.endTime}`, width: 90 },
     { title: 'Alumnas', key: 'enrolled', width: 70, render: (_, r) => (
       <Button type="link" size="small" onClick={() => { setSelectedClass(r); setViewModal(true) }}>
         {r.Clients?.length || 0}/{r.capacity}
