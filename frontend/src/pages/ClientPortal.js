@@ -131,6 +131,8 @@ function ClientPortal() {
             <img src="/logobox.png" alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ff1493' }} />
             <div>
               <Title level={5} style={{ margin: 0, color: '#ff1493' }}>Hola {profile?.name}!</Title>
+              <Text style={{ fontSize: 12, color: '#ff1493' }}>Bienvenida a Femmbox</Text>
+              <br />
               <Text style={{ fontSize: 11, color: '#aaa' }}>{currentPlan.label}</Text>
             </div>
           </div>
@@ -256,8 +258,6 @@ function ClientPortal() {
             <Text style={{ color: '#fff', fontSize: 14 }}>Calle 5 entre 26 y 28</Text>
             <br />
             <Text style={{ color: '#aaa', fontSize: 12 }}>Florentino Ameghino</Text>
-            <br />
-            <Text style={{ color: '#aaa', fontSize: 12 }}>Te esperamos de Lunes, Miercoles y Viernes!</Text>
           </Card>
         </Card>
       )}
