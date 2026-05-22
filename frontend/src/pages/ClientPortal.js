@@ -324,11 +324,28 @@ function ClientPortal() {
       {/* UBICACION */}
       {activeSection === 'ubicacion' && (
         <Card size="small" style={{ borderRadius: 12 }}>
-          <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}><EnvironmentOutlined /> Ubicacion</Title>
-          <Card size="small" style={{ background: '#2d2d2d', border: '1px solid #444' }}>
-            <Text style={{ color: '#fff', fontSize: 14 }}>Calle 5 entre 26 y 28</Text>
+          <Title level={5} style={{ color: '#ff1493', marginBottom: 12, textAlign: 'center' }}><EnvironmentOutlined /> Donde estamos</Title>
+          <Card size="small" style={{ background: '#2d2d2d', border: '1px solid #444', textAlign: 'center', marginBottom: 12 }}>
+            <Text style={{ fontSize: 20 }}>📍</Text>
             <br />
-            <Text style={{ color: '#aaa', fontSize: 12 }}>Florentino Ameghino</Text>
+            <Text style={{ color: '#fff', fontSize: 16, display: 'block', marginTop: 8 }}>Calle 5 entre 26 y 28</Text>
+            <Text style={{ color: '#aaa', fontSize: 13 }}>Florentino Ameghino, Buenos Aires</Text>
+          </Card>
+          <Card size="small" style={{ background: '#2d2d2d', border: '1px solid #444', marginBottom: 12 }}>
+            <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 8 }}>Horarios de atencion:</Text>
+            <Text style={{ color: '#ccc', fontSize: 13 }}>Lunes, Miercoles y Viernes</Text>
+            <br />
+            <Text style={{ color: '#aaa', fontSize: 12 }}>Maniana: 8:00 - 10:00 hs</Text>
+            <br />
+            <Text style={{ color: '#aaa', fontSize: 12 }}>Tarde: 14:00 - 16:00 hs</Text>
+            <br />
+            <Text style={{ color: '#aaa', fontSize: 12 }}>Noche: 19:00 - 21:00 hs</Text>
+          </Card>
+          <Card size="small" style={{ background: '#2d2d2d', border: '1px solid #444', textAlign: 'center' }}>
+            <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 8 }}>Contacto</Text>
+            <Button type="primary" size="small" style={{ background: '#25d366', borderColor: '#25d366' }} href="https://wa.me/5493388414420" target="_blank">
+              WhatsApp: 3388414420
+            </Button>
           </Card>
         </Card>
       )}
