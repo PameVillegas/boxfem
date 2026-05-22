@@ -2,9 +2,24 @@ import React, { useState, useEffect } from 'react'
 import { Card, Typography, Input, Button, message, Tag, List, Space, Spin, Empty, Row, Col, Alert } from 'antd'
 import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined, EnvironmentOutlined, InstagramOutlined } from '@ant-design/icons'
 import { portalAPI, phrasesAPI } from '../services/api'
+import { motion, AnimatePresence } from 'framer-motion'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
+
+const FadeIn = ({ children, delay = 0 }) => (
+  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay }}>
+    {children}
+  </motion.div>
+)
+
+const SectionAnim = ({ children }) => (
+  <AnimatePresence mode="wait">
+    <motion.div key={Math.random()} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
+      {children}
+    </motion.div>
+  </AnimatePresence>
+)
 
 function ClientPortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -145,9 +160,11 @@ function ClientPortal() {
     <div style={{ minHeight: '100vh', background: '#1a1a1a', padding: 12 }}>
 
       {/* Fecha de hoy */}
+      <FadeIn>
       <div style={{ textAlign: 'center', marginBottom: 8 }}>
         <Text style={{ color: '#888', fontSize: 12 }}>{todayFormatted}</Text>
       </div>
+      </FadeIn>
 
       {/* Aviso si hoy tiene turno */}
       {hasClassToday && (
@@ -205,6 +222,9 @@ function ClientPortal() {
           </Col>
         ))}
       </Row>
+
+      <AnimatePresence mode="wait">
+      <motion.div key={activeSection} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.25 }}>
 
       {/* HORARIOS */}
       {activeSection === 'horarios' && (
@@ -316,8 +336,11 @@ function ClientPortal() {
       {/* PROFE */}
       {activeSection === 'profe' && (
         <Card size="small" style={{ borderRadius: 12, textAlign: 'center' }}>
-          <Title level={4} style={{ color: '#ff1493', marginBottom: 8 }}>Tu Profe</Title>
-          <Title level={5} style={{ color: '#fff', margin: '0 0 8px' }}>Trinidad Guinazu</Title>
+          <Title level={4} style={{ color: '#ff1493', marginBottom: 12 }}>Tu Profe</Title>
+          <motion.div animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }} style={{ display: 'inline-block', fontSize: 48, marginBottom: 8 }}>
+            👋
+          </motion.div>
+          <Title level={5} style={{ color: '#fff', margin: '8px 0' }}>Trinidad Guinazu</Title>
           <Text style={{ fontSize: 14, color: '#ccc', lineHeight: 1.8, display: 'block', maxWidth: 500, margin: '0 auto' }}>
             Tengo 32 anios, soy preparadora fisica de box. Realizo entrenamientos creativos de boxeo adaptados a todos los niveles. Mi objetivo es que cada alumna se supere, se divierta y se sienta fuerte. Te espero en el ring!
           </Text>
@@ -351,6 +374,9 @@ function ClientPortal() {
           </Card>
         </div>
       )}
+
+      </motion.div>
+      </AnimatePresence>
     </div>
   )
 }
