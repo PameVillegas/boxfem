@@ -274,8 +274,8 @@ function ClientPortal() {
           </Card>
           <Card size="small" style={{ borderRadius: 12 }}>
             <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>Por que entrenar boxeo?</Title>
-            <img src="/mujer.jpeg" alt="Boxeo" style={{ width: '30%', borderRadius: 8, marginBottom: 10, objectFit: 'contain', display: 'block', margin: '0 auto 10px' }} />
-            <Text style={{ fontSize: 12, color: '#ccc' }}>El boxeo mejora tu resistencia, tonifica todo el cuerpo, libera estres y aumenta tu confianza. Cada sesion quemas entre 400 y 700 calorias. No importa tu nivel, aca crecemos juntas!</Text>
+            <img src="/mujer.jpeg" alt="Boxeo" style={{ width: '15%', borderRadius: 8, marginBottom: 10, objectFit: 'contain', display: 'block', margin: '0 auto 10px' }} />
+            <Text style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6 }}>El boxeo mejora tu resistencia, tonifica todo el cuerpo, libera estres y aumenta tu confianza. Cada sesion quemas entre 400 y 700 calorias. No importa tu nivel, aca crecemos juntas!</Text>
           </Card>
         </div>
       )}
