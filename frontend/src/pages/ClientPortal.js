@@ -266,16 +266,16 @@ function ClientPortal() {
       {activeSection === 'info' && (
         <div>
           <Card size="small" style={{ borderRadius: 12, marginBottom: 10, background: paidBeforeTen ? '#1a3a1a' : '#3a3000', border: paidBeforeTen ? '1px solid #52c41a' : '1px solid #d4a017' }}>
-            <div style={{ textAlign: 'center' }}>
-              <Text style={{ fontSize: 24 }}>🎁</Text>
-              <Title level={5} style={{ margin: '4px 0', color: paidBeforeTen ? '#52c41a' : '#d4a017' }}>Sorteo Mensual</Title>
-              <Text style={{ fontSize: 13, color: paidBeforeTen ? '#52c41a' : '#d4a017' }}>{paidBeforeTen ? 'Estas participando! Pagaste antes del 10. Mucha suerte!' : 'Paga antes del dia 10 y participas del sorteo de la profe!'}</Text>
+            <div style={{ textAlign: 'center', padding: '12px 0' }}>
+              <Text style={{ fontSize: 32 }}>🎁</Text>
+              <Title level={4} style={{ margin: '8px 0', color: paidBeforeTen ? '#52c41a' : '#d4a017', textAlign: 'center' }}>Sorteo Mensual</Title>
+              <Text style={{ fontSize: 15, color: paidBeforeTen ? '#52c41a' : '#d4a017' }}>{paidBeforeTen ? 'Estas participando! Pagaste antes del 10. Mucha suerte!' : 'Paga antes del dia 10 y participas del sorteo de la profe!'}</Text>
             </div>
           </Card>
-          <Card size="small" style={{ borderRadius: 12 }}>
-            <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>Por que entrenar boxeo?</Title>
-            <img src="/mujer.jpeg" alt="Boxeo" style={{ width: '15%', borderRadius: 8, marginBottom: 10, objectFit: 'contain', display: 'block', margin: '0 auto 10px' }} />
-            <Text style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6 }}>El boxeo mejora tu resistencia, tonifica todo el cuerpo, libera estres y aumenta tu confianza. Cada sesion quemas entre 400 y 700 calorias. No importa tu nivel, aca crecemos juntas!</Text>
+          <Card size="small" style={{ borderRadius: 12, textAlign: 'center' }}>
+            <Title level={4} style={{ color: '#ff1493', marginBottom: 12, textAlign: 'center' }}>Por que entrenar boxeo?</Title>
+            <img src="/mujer.jpeg" alt="Boxeo" style={{ width: '15%', borderRadius: 8, marginBottom: 12, objectFit: 'contain', display: 'block', margin: '0 auto 12px' }} />
+            <Text style={{ fontSize: 16, color: '#ccc', lineHeight: 1.8, display: 'block', maxWidth: 600, margin: '0 auto' }}>El boxeo mejora tu resistencia, tonifica todo el cuerpo, libera estres y aumenta tu confianza. Cada sesion quemas entre 400 y 700 calorias. No importa tu nivel, aca crecemos juntas! 💪</Text>
           </Card>
         </div>
       )}
