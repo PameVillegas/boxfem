@@ -181,13 +181,13 @@ function ClientPortal() {
       )}
 
       {/* Header con logo */}
-      <Card size="small" style={{ marginBottom: 10, borderRadius: 12 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src="/logobox.png" alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ff1493' }} />
+      <Card size="small" style={{ marginBottom: 10, borderRadius: 12, padding: '12px 0', border: '1px solid #ff1493' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <img src="/logobox.png" alt="" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ff1493' }} />
             <div>
-              <Title level={5} style={{ margin: 0, color: '#ff1493' }}>Hola {profile?.name}!</Title>
-              <Text style={{ fontSize: 12, color: '#ff1493' }}>Bienvenida a Femmbox</Text>
+              <Title level={4} style={{ margin: 0, color: '#ff1493' }}>Hola {profile?.name}!</Title>
+              <Text style={{ fontSize: 14, color: '#ff1493' }}>Bienvenida a Femmbox</Text>
             </div>
           </div>
           <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout} danger size="small" />
