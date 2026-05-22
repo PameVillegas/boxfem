@@ -17,6 +17,7 @@ function ClientPortal() {
   const [classes, setClasses] = useState([])
   const [attendance, setAttendance] = useState([])
   const [dataLoading, setDataLoading] = useState(false)
+  const [showEditTurnos, setShowEditTurnos] = useState(false)
   const [activeSection, setActiveSection] = useState('horarios')
   const [dailyPhrase, setDailyPhrase] = useState('')
 
@@ -135,6 +136,7 @@ function ClientPortal() {
     { key: 'horarios', icon: <CalendarOutlined />, label: 'Horarios' },
     { key: 'pagos', icon: <DollarOutlined />, label: 'Pagos' },
     { key: 'asistencia', icon: <CheckCircleOutlined />, label: 'Asistencia' },
+    { key: 'profe', icon: <UserOutlined />, label: 'Profe' },
     { key: 'ubicacion', icon: <EnvironmentOutlined />, label: 'Ubicacion' },
     { key: 'info', icon: <ClockCircleOutlined />, label: 'Info' }
   ]
@@ -195,10 +197,10 @@ function ClientPortal() {
       {/* Navegacion */}
       <Row gutter={[6, 6]} style={{ marginBottom: 10 }}>
         {sections.map(s => (
-          <Col span={Math.floor(24 / sections.length)} key={s.key} style={{ minWidth: 0 }}>
-            <Card size="small" style={{ borderRadius: 10, textAlign: 'center', cursor: 'pointer', border: activeSection === s.key ? '2px solid #ff1493' : '1px solid #444', background: activeSection === s.key ? '#3a1a2a' : '#2d2d2d' }} bodyStyle={{ padding: 6 }} onClick={() => setActiveSection(s.key)}>
-              <div style={{ fontSize: 16, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.icon}</div>
-              <Text style={{ fontSize: 9, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.label}</Text>
+          <Col span={8} key={s.key}>
+            <Card size="small" style={{ borderRadius: 10, textAlign: 'center', cursor: 'pointer', border: activeSection === s.key ? '2px solid #ff1493' : '1px solid #444', background: activeSection === s.key ? '#3a1a2a' : '#2d2d2d' }} bodyStyle={{ padding: 8 }} onClick={() => setActiveSection(s.key)}>
+              <div style={{ fontSize: 18, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.icon}</div>
+              <Text style={{ fontSize: 10, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.label}</Text>
             </Card>
           </Col>
         ))}
@@ -209,49 +211,63 @@ function ClientPortal() {
         <Card size="small" style={{ borderRadius: 12 }}>
           <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>Mis Entrenamientos</Title>
           {enrolledClasses.length > 0 ? (
-            <Card size="small" style={{ marginBottom: 12, background: '#2d2d2d', border: '1px solid #ff1493' }}>
-              <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 6 }}>Estoy inscripta en:</Text>
-              {['monday', 'wednesday', 'friday'].map(day => {
-                const my = enrolledClasses.filter(c => c.dayOfWeek === day)
-                if (my.length === 0) return null
-                return <div key={day} style={{ marginBottom: 4 }}><Text style={{ color: '#fff' }}><strong>{dayNames[day]}:</strong> {my.map(c => c.startTime + '-' + c.endTime).join(', ')}</Text></div>
-              })}
-              <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #444' }}>
-                <Text style={{ color: '#fff' }}>Plan: <strong>{currentPlan.label}</strong> — <strong style={{ color: '#ff1493' }}>${currentPlan.price.toLocaleString()}</strong></Text>
-              </div>
-            </Card>
-          ) : (
-            <Alert message="Todavia no elegiste tus dias. Selecciona abajo en que horarios queres entrenar." type="info" showIcon style={{ marginBottom: 12 }} />
-          )}
-          {enrolledDays === 1 && <Alert style={{ marginBottom: 12 }} type="warning" showIcon message="Si te anotas en otro dia, tu plan pasa a 2 veces por semana ($25.000)" />}
-          {enrolledDays === 2 && <Alert style={{ marginBottom: 12 }} type="warning" showIcon message="Si te anotas en un dia mas, tu plan pasa a semana completa ($35.000). Diferencia: $10.000" />}
-          <div style={{ marginBottom: 12 }}>
-            <Text style={{ fontSize: 12, color: '#aaa', display: 'block', marginBottom: 6 }}>Planes:</Text>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              <Tag color={enrolledDays === 2 ? '#ff1493' : 'default'}>2x sem: $25.000</Tag>
-              <Tag color={enrolledDays === 3 ? '#ff1493' : 'default'}>3x sem: $30.000</Tag>
-              <Tag color={enrolledDays >= 3 ? '#ff1493' : 'default'}>L-M-V: $35.000</Tag>
-            </div>
-          </div>
-          <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 8 }}>Elegi o cambia tus dias y horarios:</Text>
-          {['monday', 'wednesday', 'friday'].map(day => {
-            const dayClasses = (classesByDay[day] || []).sort((a, b) => a.startTime.localeCompare(b.startTime))
-            const isIn = enrolledClasses.some(c => c.dayOfWeek === day)
-            return (
-              <div key={day} style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <Text strong style={{ color: '#ff1493', fontSize: 14 }}>{dayNames[day]}</Text>
-                  {isIn && <Tag color="green" style={{ fontSize: 10 }}>Inscripta</Tag>}
+            <div>
+              <Card size="small" style={{ marginBottom: 12, background: '#2d2d2d', border: '1px solid #ff1493' }}>
+                <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 6 }}>Estoy inscripta en:</Text>
+                {['monday', 'wednesday', 'friday'].map(day => {
+                  const my = enrolledClasses.filter(c => c.dayOfWeek === day)
+                  if (my.length === 0) return null
+                  return <div key={day} style={{ marginBottom: 4 }}><Text style={{ color: '#fff' }}><strong>{dayNames[day]}:</strong> {my.map(c => c.startTime + '-' + c.endTime).join(', ')}</Text></div>
+                })}
+                <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #444' }}>
+                  <Text style={{ color: '#fff' }}>Plan: <strong>{currentPlan.label}</strong> — <strong style={{ color: '#ff1493' }}>${currentPlan.price.toLocaleString()}</strong></Text>
                 </div>
-                {dayClasses.length > 0 ? dayClasses.map(item => (
-                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', borderRadius: 8, marginBottom: 4, background: item.isEnrolled ? '#1a3a1a' : '#2d2d2d', border: item.isEnrolled ? '1px solid #52c41a' : '1px solid #444' }}>
-                    <div><Text style={{ fontSize: 14, color: '#fff' }}>{item.startTime} - {item.endTime}</Text><Text style={{ fontSize: 10, marginLeft: 8, color: '#888' }}>{item.enrolled}/{item.capacity}</Text></div>
-                    {item.isEnrolled ? <Button size="small" danger onClick={() => handleUnenroll(item.id)}>Salir</Button> : <Button size="small" type="primary" onClick={() => handleEnroll(item.id)} disabled={item.enrolled >= item.capacity || profile?.status !== 'active'}>Elegir</Button>}
-                  </div>
-                )) : <Text style={{ fontSize: 12, color: '#666' }}>Sin turnos cargados</Text>}
+              </Card>
+              <Button type="primary" block onClick={() => setShowEditTurnos(!showEditTurnos)} style={{ marginBottom: 12 }}>
+                {showEditTurnos ? 'Ocultar horarios' : 'Editar turno'}
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <Alert message="Todavia no elegiste tus dias. Selecciona abajo en que horarios queres entrenar." type="info" showIcon style={{ marginBottom: 12 }} />
+              <Button type="primary" block onClick={() => setShowEditTurnos(true)} style={{ marginBottom: 12 }}>Elegir dias y horarios</Button>
+            </div>
+          )}
+
+          {/* Editor de turnos (oculto hasta que aprieta el boton) */}
+          {showEditTurnos && (
+            <div>
+              {enrolledDays === 1 && <Alert style={{ marginBottom: 12 }} type="warning" showIcon message="Si te anotas en otro dia, tu plan pasa a 2 veces por semana ($25.000)" />}
+              {enrolledDays === 2 && <Alert style={{ marginBottom: 12 }} type="warning" showIcon message="Si te anotas en un dia mas, tu plan pasa a semana completa ($35.000). Diferencia: $10.000" />}
+              <div style={{ marginBottom: 12 }}>
+                <Text style={{ fontSize: 12, color: '#aaa', display: 'block', marginBottom: 6 }}>Planes:</Text>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  <Tag color={enrolledDays === 2 ? '#ff1493' : 'default'}>2x sem: $25.000</Tag>
+                  <Tag color={enrolledDays === 3 ? '#ff1493' : 'default'}>3x sem: $30.000</Tag>
+                  <Tag color={enrolledDays >= 3 ? '#ff1493' : 'default'}>L-M-V: $35.000</Tag>
+                </div>
               </div>
-            )
-          })}
+              <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 8 }}>Dias y horarios disponibles:</Text>
+              {['monday', 'wednesday', 'friday'].map(day => {
+                const dayClasses = (classesByDay[day] || []).sort((a, b) => a.startTime.localeCompare(b.startTime))
+                const isIn = enrolledClasses.some(c => c.dayOfWeek === day)
+                return (
+                  <div key={day} style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <Text strong style={{ color: '#ff1493', fontSize: 14 }}>{dayNames[day]}</Text>
+                      {isIn && <Tag color="green" style={{ fontSize: 10 }}>Inscripta</Tag>}
+                    </div>
+                    {dayClasses.length > 0 ? dayClasses.map(item => (
+                      <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', borderRadius: 8, marginBottom: 4, background: item.isEnrolled ? '#1a3a1a' : '#2d2d2d', border: item.isEnrolled ? '1px solid #52c41a' : '1px solid #444' }}>
+                        <div><Text style={{ fontSize: 14, color: '#fff' }}>{item.startTime} - {item.endTime}</Text><Text style={{ fontSize: 10, marginLeft: 8, color: '#888' }}>{item.enrolled}/{item.capacity}</Text></div>
+                        {item.isEnrolled ? <Button size="small" danger onClick={() => handleUnenroll(item.id)}>Salir</Button> : <Button size="small" type="primary" onClick={() => handleEnroll(item.id)} disabled={item.enrolled >= item.capacity || profile?.status !== 'active'}>Elegir</Button>}
+                      </div>
+                    )) : <Text style={{ fontSize: 12, color: '#666' }}>Sin turnos cargados</Text>}
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </Card>
       )}
 
@@ -297,6 +313,17 @@ function ClientPortal() {
         </Card>
       )}
 
+      {/* PROFE */}
+      {activeSection === 'profe' && (
+        <Card size="small" style={{ borderRadius: 12, textAlign: 'center' }}>
+          <Title level={4} style={{ color: '#ff1493', marginBottom: 8 }}>Tu Profe</Title>
+          <Title level={5} style={{ color: '#fff', margin: '0 0 8px' }}>Trinidad Guinazu</Title>
+          <Text style={{ fontSize: 14, color: '#ccc', lineHeight: 1.8, display: 'block', maxWidth: 500, margin: '0 auto' }}>
+            Tengo 32 anios, soy preparadora fisica de box. Realizo entrenamientos creativos de boxeo adaptados a todos los niveles. Mi objetivo es que cada alumna se supere, se divierta y se sienta fuerte. Te espero en el ring!
+          </Text>
+        </Card>
+      )}
+
       {/* INFO */}
       {activeSection === 'info' && (
         <div>
@@ -307,15 +334,6 @@ function ClientPortal() {
               <Title level={4} style={{ margin: '8px 0', color: paidBeforeTen ? '#52c41a' : '#d4a017', textAlign: 'center' }}>Sorteo Mensual</Title>
               <Text style={{ fontSize: 15, color: paidBeforeTen ? '#52c41a' : '#d4a017' }}>{paidBeforeTen ? 'Estas participando! Pagaste antes del 10. Mucha suerte!' : 'Si pagas antes del 10 de cada mes, participas de un sorteo de un regalo sorpresa!'}</Text>
             </div>
-          </Card>
-
-          {/* Profe */}
-          <Card size="small" style={{ borderRadius: 12, marginBottom: 10, textAlign: 'center' }}>
-            <Title level={4} style={{ color: '#ff1493', marginBottom: 8 }}>Tu Profe</Title>
-            <Title level={5} style={{ color: '#fff', margin: '0 0 8px' }}>Trinidad Guinazu</Title>
-            <Text style={{ fontSize: 14, color: '#ccc', lineHeight: 1.8, display: 'block', maxWidth: 500, margin: '0 auto' }}>
-              Tengo 32 anios, soy preparadora fisica de box. Realizo entrenamientos creativos de boxeo adaptados a todos los niveles. Mi objetivo es que cada alumna se supere, se divierta y se sienta fuerte. Te espero en el ring!
-            </Text>
           </Card>
 
           {/* Boxeo */}
