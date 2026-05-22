@@ -88,9 +88,10 @@ function Attendance() {
             <DatePicker value={selectedDate} onChange={(d) => d && setSelectedDate(d)} style={{ flex: 1 }} />
             <TimePicker value={selectedTime} onChange={setSelectedTime} format="HH:mm" placeholder="Hora" style={{ width: 100 }} />
             <Select placeholder="Clase" value={selectedClass} onChange={setSelectedClass} allowClear style={{ minWidth: 120 }}>
-              {classes.map(c => (
-                <Select.Option key={c.id} value={c.id}>{c.name} - {c.dayOfWeek || ''} {c.startTime}</Select.Option>
-              ))}
+              {classes.map(c => {
+                const dias = { monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miercoles', thursday: 'Jueves', friday: 'Viernes', saturday: 'Sabado' }
+                return <Select.Option key={c.id} value={c.id}>{dias[c.dayOfWeek] || c.dayOfWeek || ''} {c.startTime}-{c.endTime}</Select.Option>
+              })}
             </Select>
           </Space>
           <Button type="primary" icon={<LoginOutlined />} onClick={handleCheckIn} block>
