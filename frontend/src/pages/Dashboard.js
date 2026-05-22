@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Row, Col, Card, Statistic, Typography, Spin, List, Tag, Empty, Button, message } from 'antd'
-import { UserOutlined, DollarOutlined, WarningOutlined, CheckCircleOutlined, BellOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import { UserOutlined, DollarOutlined, WarningOutlined, CheckCircleOutlined, BellOutlined, CloseCircleOutlined, CalendarOutlined } from '@ant-design/icons'
 import { dashboardAPI, alertsAPI } from '../services/api'
 import { useNavigate } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -56,10 +56,19 @@ function Dashboard() {
         <Col>
           {alerts.length > 0 && (
             <Tag color="red" style={{ padding: '4px 12px', fontSize: 14 }}>
-              <BellOutlined /> {alerts.length} alerta{alerts.length > 1 ? 's' : ''} pendiente{alerts.length > 1 ? 's' : ''}
+              <BellOutlined /> {alerts.length} alerta{alerts.length > 1 ? 's' : ''}
             </Tag>
           )}
         </Col>
+      </Row>
+
+      {/* Navegacion rapida en cuadricula */}
+      <Row gutter={[8, 8]} style={{ marginBottom: 12 }}>
+        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/clients')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><UserOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>Clientes</Text></Card></Col>
+        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/payments')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><DollarOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>Pagos</Text></Card></Col>
+        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/classes')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><CalendarOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>Clases</Text></Card></Col>
+        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/attendance')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><CheckCircleOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>Asistencia</Text></Card></Col>
+        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/whatsapp')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><BellOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>WhatsApp</Text></Card></Col>
       </Row>
 
       <Row gutter={[12, 12]}>

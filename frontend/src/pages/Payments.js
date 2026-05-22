@@ -110,8 +110,12 @@ function Payments() {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="amount" label="Monto ($)" rules={[{ required: true, message: 'Ingresá el monto' }]}>
-            <Input type="number" placeholder="Ej: 15000" />
+          <Form.Item name="amount" label="Monto ($)" rules={[{ required: true, message: 'Selecciona el monto' }]}>
+            <Select placeholder="Seleccionar monto">
+              <Select.Option value={25000}>$25.000 - 2 veces por semana</Select.Option>
+              <Select.Option value={30000}>$30.000 - 3 veces por semana</Select.Option>
+              <Select.Option value={35000}>$35.000 - Semana completa</Select.Option>
+            </Select>
           </Form.Item>
           <Form.Item name="paymentMethod" label="Método de Pago" initialValue="cash">
             <Select>
@@ -122,7 +126,20 @@ function Payments() {
             </Select>
           </Form.Item>
           <Form.Item name="planMonth" label="Mes que paga">
-            <Input placeholder="Ej: Junio 2026" />
+            <Select placeholder="Seleccionar mes">
+              <Select.Option value="Enero 2026">Enero 2026</Select.Option>
+              <Select.Option value="Febrero 2026">Febrero 2026</Select.Option>
+              <Select.Option value="Marzo 2026">Marzo 2026</Select.Option>
+              <Select.Option value="Abril 2026">Abril 2026</Select.Option>
+              <Select.Option value="Mayo 2026">Mayo 2026</Select.Option>
+              <Select.Option value="Junio 2026">Junio 2026</Select.Option>
+              <Select.Option value="Julio 2026">Julio 2026</Select.Option>
+              <Select.Option value="Agosto 2026">Agosto 2026</Select.Option>
+              <Select.Option value="Septiembre 2026">Septiembre 2026</Select.Option>
+              <Select.Option value="Octubre 2026">Octubre 2026</Select.Option>
+              <Select.Option value="Noviembre 2026">Noviembre 2026</Select.Option>
+              <Select.Option value="Diciembre 2026">Diciembre 2026</Select.Option>
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
