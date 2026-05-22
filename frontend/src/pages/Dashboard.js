@@ -69,15 +69,6 @@ function Dashboard() {
         </Col>
       </Row>
 
-      {/* Navegacion rapida en cuadricula */}
-      <Row gutter={[8, 8]} style={{ marginBottom: 12 }}>
-        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/clients')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><UserOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>Clientes</Text></Card></Col>
-        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/payments')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><DollarOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>Pagos</Text></Card></Col>
-        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/classes')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><CalendarOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>Clases</Text></Card></Col>
-        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/attendance')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><CheckCircleOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>Asistencia</Text></Card></Col>
-        <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/whatsapp')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><BellOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>WhatsApp</Text></Card></Col>
-      </Row>
-
       {/* Frase del dia */}
       <Card size="small" style={{ marginBottom: 12, borderRadius: 10 }}>
         <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 8 }}>Frase del dia para las alumnas:</Text>
