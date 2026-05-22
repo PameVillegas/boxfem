@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, Typography, Input, Button, message, Tag, List, Space, Spin, Empty, Row, Col, Alert } from 'antd'
-import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined, EnvironmentOutlined } from '@ant-design/icons'
-import { portalAPI } from '../services/api'
+import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined, EnvironmentOutlined, InstagramOutlined } from '@ant-design/icons'
+import { portalAPI, phrasesAPI } from '../services/api'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -18,11 +18,17 @@ function ClientPortal() {
   const [attendance, setAttendance] = useState([])
   const [dataLoading, setDataLoading] = useState(false)
   const [activeSection, setActiveSection] = useState('horarios')
+  const [dailyPhrase, setDailyPhrase] = useState('')
 
   useEffect(() => {
     const token = localStorage.getItem('clientToken')
     if (token) { setIsLoggedIn(true); loadData(token) }
+    loadPhrase()
   }, [])
+
+  const loadPhrase = async () => {
+    try { const res = await phrasesAPI.getToday(); setDailyPhrase(res.data.phrase || '') } catch(e) {}
+  }
 
   const handleLogin = async () => {
     if (!nameInput || !lastName || !code) return message.warning('Completa todos los campos')
@@ -68,11 +74,19 @@ function ClientPortal() {
     } catch (error) { message.error(error.response?.data?.error || 'Error') }
   }
 
+  // Fecha de hoy formateada
+  const todayFormatted = dayjs().format('dddd DD [de] MMMM, YYYY')
+  const todayDayName = dayjs().format('dddd').toLowerCase()
+  const dayMap = { lunes: 'monday', martes: 'tuesday', miercoles: 'wednesday', jueves: 'thursday', viernes: 'friday', sabado: 'saturday', domingo: 'sunday' }
+
   // LOGIN
   if (!isLoggedIn) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#1a1a1a', padding: 16 }}>
         <Card style={{ width: '100%', maxWidth: 380, borderRadius: 16, background: '#2a2a2a', border: 'none' }}>
+          <div style={{ textAlign: 'center', marginBottom: 8 }}>
+            <Text style={{ color: '#888', fontSize: 12 }}>{todayFormatted}</Text>
+          </div>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
             <img src="/logobox.png" alt="FemmBox" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #ff1493' }} />
             <Title level={3} style={{ color: '#ff1493', marginTop: 12, marginBottom: 4 }}>FEMMBOX</Title>
@@ -113,6 +127,10 @@ function ClientPortal() {
   classes.forEach(c => { const day = c.dayOfWeek || 'x'; if (!classesByDay[day]) classesByDay[day] = []; classesByDay[day].push(c) })
   const dayNames = { monday: 'Lunes', wednesday: 'Miercoles', friday: 'Viernes' }
 
+  // Verificar si hoy tiene turno
+  const todayEnglish = dayMap[todayDayName] || ''
+  const hasClassToday = enrolledClasses.some(c => c.dayOfWeek === todayEnglish)
+
   const sections = [
     { key: 'horarios', icon: <CalendarOutlined />, label: 'Horarios' },
     { key: 'pagos', icon: <DollarOutlined />, label: 'Pagos' },
@@ -124,6 +142,25 @@ function ClientPortal() {
   return (
     <div style={{ minHeight: '100vh', background: '#1a1a1a', padding: 12 }}>
 
+      {/* Fecha de hoy */}
+      <div style={{ textAlign: 'center', marginBottom: 8 }}>
+        <Text style={{ color: '#888', fontSize: 12 }}>{todayFormatted}</Text>
+      </div>
+
+      {/* Aviso si hoy tiene turno */}
+      {hasClassToday && (
+        <Card size="small" style={{ marginBottom: 10, borderRadius: 10, background: '#1a3a1a', border: '1px solid #52c41a', textAlign: 'center' }}>
+          <Text style={{ color: '#52c41a', fontSize: 14 }}>🥊 <strong>Hoy es dia de entrenamiento!</strong></Text>
+        </Card>
+      )}
+
+      {/* Frase del dia */}
+      {dailyPhrase && (
+        <Card size="small" style={{ marginBottom: 10, borderRadius: 10, background: '#2d2d2d', border: '1px solid #ff1493', textAlign: 'center' }}>
+          <Text style={{ color: '#ff1493', fontSize: 13, fontStyle: 'italic' }}>"{dailyPhrase}"</Text>
+        </Card>
+      )}
+
       {/* Header con logo */}
       <Card size="small" style={{ marginBottom: 10, borderRadius: 12 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -132,8 +169,6 @@ function ClientPortal() {
             <div>
               <Title level={5} style={{ margin: 0, color: '#ff1493' }}>Hola {profile?.name}!</Title>
               <Text style={{ fontSize: 12, color: '#ff1493' }}>Bienvenida a Femmbox</Text>
-              <br />
-              <Text style={{ fontSize: 11, color: '#aaa' }}>{currentPlan.label}</Text>
             </div>
           </div>
           <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout} danger size="small" />
@@ -265,17 +300,36 @@ function ClientPortal() {
       {/* INFO */}
       {activeSection === 'info' && (
         <div>
+          {/* Sorteo */}
           <Card size="small" style={{ borderRadius: 12, marginBottom: 10, background: paidBeforeTen ? '#1a3a1a' : '#3a3000', border: paidBeforeTen ? '1px solid #52c41a' : '1px solid #d4a017' }}>
             <div style={{ textAlign: 'center', padding: '12px 0' }}>
               <Text style={{ fontSize: 32 }}>🎁</Text>
               <Title level={4} style={{ margin: '8px 0', color: paidBeforeTen ? '#52c41a' : '#d4a017', textAlign: 'center' }}>Sorteo Mensual</Title>
-              <Text style={{ fontSize: 15, color: paidBeforeTen ? '#52c41a' : '#d4a017' }}>{paidBeforeTen ? 'Estas participando! Pagaste antes del 10. Mucha suerte!' : 'Paga antes del dia 10 y participas del sorteo de la profe!'}</Text>
+              <Text style={{ fontSize: 15, color: paidBeforeTen ? '#52c41a' : '#d4a017' }}>{paidBeforeTen ? 'Estas participando! Pagaste antes del 10. Mucha suerte!' : 'Si pagas antes del 10 de cada mes, participas de un sorteo de un regalo sorpresa!'}</Text>
             </div>
           </Card>
-          <Card size="small" style={{ borderRadius: 12, textAlign: 'center' }}>
+
+          {/* Profe */}
+          <Card size="small" style={{ borderRadius: 12, marginBottom: 10, textAlign: 'center' }}>
+            <Title level={4} style={{ color: '#ff1493', marginBottom: 8 }}>Tu Profe</Title>
+            <Title level={5} style={{ color: '#fff', margin: '0 0 8px' }}>Trinidad Guinazu</Title>
+            <Text style={{ fontSize: 14, color: '#ccc', lineHeight: 1.8, display: 'block', maxWidth: 500, margin: '0 auto' }}>
+              Tengo 32 anios, soy preparadora fisica de box. Realizo entrenamientos creativos de boxeo adaptados a todos los niveles. Mi objetivo es que cada alumna se supere, se divierta y se sienta fuerte. Te espero en el ring!
+            </Text>
+          </Card>
+
+          {/* Boxeo */}
+          <Card size="small" style={{ borderRadius: 12, marginBottom: 10, textAlign: 'center' }}>
             <Title level={4} style={{ color: '#ff1493', marginBottom: 12, textAlign: 'center' }}>Por que entrenar boxeo?</Title>
-            <img src="/mujer.jpeg" alt="Boxeo" style={{ width: '15%', borderRadius: 8, marginBottom: 12, objectFit: 'contain', display: 'block', margin: '0 auto 12px' }} />
-            <Text style={{ fontSize: 16, color: '#ccc', lineHeight: 1.8, display: 'block', maxWidth: 600, margin: '0 auto' }}>El boxeo mejora tu resistencia, tonifica todo el cuerpo, libera estres y aumenta tu confianza. Cada sesion quemas entre 400 y 700 calorias. No importa tu nivel, aca crecemos juntas! 💪</Text>
+            <img src="/mujer.jpeg" alt="Boxeo" style={{ width: '15%', borderRadius: 8, objectFit: 'contain', display: 'block', margin: '0 auto 12px' }} />
+            <Text style={{ fontSize: 16, color: '#ccc', lineHeight: 1.8, display: 'block', maxWidth: 600, margin: '0 auto' }}>El boxeo mejora tu resistencia, tonifica todo el cuerpo, libera estres y aumenta tu confianza. Cada sesion quemas entre 400 y 700 calorias. No importa tu nivel, aca crecemos juntas!</Text>
+          </Card>
+
+          {/* Instagram */}
+          <Card size="small" style={{ borderRadius: 12, textAlign: 'center' }}>
+            <Button type="primary" size="large" icon={<InstagramOutlined />} style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', borderColor: 'transparent', fontWeight: 'bold' }} href="https://www.instagram.com/femmbox_?igsh=ZDVtMjlrNHB0Nzho" target="_blank" block>
+              Seguinos en Instagram
+            </Button>
           </Card>
         </div>
       )}

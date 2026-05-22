@@ -66,6 +66,12 @@ export const alertsAPI = {
   resolve: (id) => api.put(`/alerts/${id}/resolve`)
 }
 
+export const phrasesAPI = {
+  getToday: () => api.get('/phrases/today'),
+  getAll: () => api.get('/phrases'),
+  create: (phrase, date) => api.post('/phrases', { phrase, date })
+}
+
 export const whatsappAPI = {
   getStatus: () => api.get('/whatsapp/status'),
   sendTest: (phone, message) => api.post('/whatsapp/test', { phone, message }),

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Row, Col, Card, Statistic, Typography, Spin, List, Tag, Empty, Button, message } from 'antd'
+import { Row, Col, Card, Statistic, Typography, Spin, List, Tag, Empty, Button, message, Input } from 'antd'
 import { UserOutlined, DollarOutlined, WarningOutlined, CheckCircleOutlined, BellOutlined, CloseCircleOutlined, CalendarOutlined } from '@ant-design/icons'
-import { dashboardAPI, alertsAPI } from '../services/api'
+import { dashboardAPI, alertsAPI, phrasesAPI } from '../services/api'
 import { useNavigate } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import dayjs from 'dayjs'
@@ -12,6 +12,8 @@ function Dashboard() {
   const [stats, setStats] = useState(null)
   const [alerts, setAlerts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [phrase, setPhrase] = useState('')
+  const [savedPhrase, setSavedPhrase] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -20,12 +22,17 @@ function Dashboard() {
 
   const loadData = async () => {
     try {
-      const [statsRes, alertsRes] = await Promise.all([
+      const [statsRes, alertsRes, phraseRes] = await Promise.all([
         dashboardAPI.getStats(),
-        alertsAPI.getAll()
+        alertsAPI.getAll(),
+        phrasesAPI.getToday()
       ])
       setStats(statsRes.data)
       setAlerts(alertsRes.data)
+      if (phraseRes.data.phrase) {
+        setSavedPhrase(phraseRes.data.phrase)
+        setPhrase(phraseRes.data.phrase)
+      }
     } catch (error) {
       console.error(error)
     } finally {
@@ -70,6 +77,22 @@ function Dashboard() {
         <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/attendance')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><CheckCircleOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>Asistencia</Text></Card></Col>
         <Col xs={8} md={4}><Card size="small" hoverable onClick={() => navigate('/whatsapp')} style={{ textAlign: 'center', borderRadius: 10 }} bodyStyle={{ padding: 10 }}><BellOutlined style={{ fontSize: 20, color: '#ff1493' }} /><br /><Text style={{ fontSize: 11 }}>WhatsApp</Text></Card></Col>
       </Row>
+
+      {/* Frase del dia */}
+      <Card size="small" style={{ marginBottom: 12, borderRadius: 10 }}>
+        <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 8 }}>Frase del dia para las alumnas:</Text>
+        <Input.TextArea
+          rows={2}
+          value={phrase}
+          onChange={(e) => setPhrase(e.target.value)}
+          placeholder="Escribi la frase motivacional de hoy..."
+          style={{ marginBottom: 8 }}
+        />
+        <Button type="primary" size="small" onClick={async () => { try { await phrasesAPI.create(phrase); setSavedPhrase(phrase); message.success('Frase guardada!') } catch(e) { message.error('Error') } }}>
+          Guardar Frase
+        </Button>
+        {savedPhrase && <Text style={{ display: 'block', marginTop: 8, fontSize: 12, color: '#888' }}>Actual: "{savedPhrase}"</Text>}
+      </Card>
 
       <Row gutter={[12, 12]}>
         <Col xs={12} sm={12} md={6}>

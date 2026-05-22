@@ -5,6 +5,7 @@ const Class = require('./Class')
 const Attendance = require('./Attendance')
 const User = require('./User')
 const Alert = require('./Alert')
+const DailyPhrase = require('./DailyPhrase')
 
 Client.belongsTo(Plan, { foreignKey: 'planId' })
 Plan.hasMany(Client, { foreignKey: 'planId' })
@@ -23,4 +24,4 @@ Client.belongsToMany(Class, { through: 'ClassClients', foreignKey: 'clientId' })
 
 Attendance.belongsTo(Class, { foreignKey: 'classId' })
 
-module.exports = { Client, Plan, Payment, Class, Attendance, User, Alert }
+module.exports = { Client, Plan, Payment, Class, Attendance, User, Alert, DailyPhrase }
