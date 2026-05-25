@@ -127,7 +127,7 @@ function ClientPortal() {
   const enrolledClasses = classes.filter(c => c.isEnrolled)
   const enrolledDays = new Set(enrolledClasses.map(c => c.dayOfWeek)).size
   const getPlan = (days) => {
-    if (days >= 3) return { label: 'Semana completa (L-M-V)', price: 35000 }
+    if (days === 3) return { label: 'Semana completa (L-M-V)', price: 35000 }
     if (days === 2) return { label: '2 veces por semana', price: 25000 }
     if (days === 1) return { label: '1 vez por semana', price: 25000 }
     return { label: 'Sin plan', price: 0 }
@@ -263,8 +263,7 @@ function ClientPortal() {
                 <Text style={{ fontSize: 12, color: '#aaa', display: 'block', marginBottom: 6 }}>Planes:</Text>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   <Tag color={enrolledDays === 2 ? '#ff1493' : 'default'}>2x sem: $25.000</Tag>
-                  <Tag color={enrolledDays === 3 ? '#ff1493' : 'default'}>3x sem: $30.000</Tag>
-                  <Tag color={enrolledDays >= 3 ? '#ff1493' : 'default'}>L-M-V: $35.000</Tag>
+                  <Tag color={enrolledDays === 3 ? '#ff1493' : 'default'}>L-M-V: $35.000</Tag>
                 </div>
               </div>
               <Text strong style={{ color: '#ff1493', display: 'block', marginBottom: 8 }}>Dias y horarios disponibles:</Text>
