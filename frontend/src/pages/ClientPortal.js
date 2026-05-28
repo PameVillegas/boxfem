@@ -358,6 +358,7 @@ function ClientPortal() {
           <motion.div animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }} style={{ display: 'inline-block', fontSize: 48, marginBottom: 12 }}>
             🥊
           </motion.div>
+          <img src="/trini.png" alt="Trinidad" style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', border: '3px solid #ff1493', display: 'block', margin: '0 auto 12px' }} />
           <Title level={3} style={{ color: '#fff', margin: '0 0 4px', letterSpacing: 1 }}>TU ENTRENADORA</Title>
           <Text style={{ fontSize: 16, color: '#ff69b4', display: 'block', marginBottom: 16 }}>Trinidad Guinazu</Text>
           <Text style={{ fontSize: 13, color: '#aaa', display: 'block', marginBottom: 16 }}>Preparadora fisica y coach de boxeo</Text>
