@@ -354,15 +354,46 @@ function ClientPortal() {
 
       {/* PROFE */}
       {activeSection === 'profe' && (
-        <Card size="small" style={{ borderRadius: 12, textAlign: 'center' }}>
-          <Title level={4} style={{ color: '#ff1493', marginBottom: 12 }}>Tu Profe</Title>
-          <motion.div animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }} style={{ display: 'inline-block', fontSize: 48, marginBottom: 8 }}>
-            👋
+        <Card style={{ borderRadius: 16, textAlign: 'center', background: 'rgba(45,45,45,0.85)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,20,147,0.3)', boxShadow: '0 8px 32px rgba(255,20,147,0.15)', padding: '24px 16px' }}>
+          <motion.div animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }} style={{ display: 'inline-block', fontSize: 48, marginBottom: 12 }}>
+            🥊
           </motion.div>
-          <Title level={5} style={{ color: '#fff', margin: '8px 0' }}>Trinidad Guinazu</Title>
-          <Text style={{ fontSize: 14, color: '#ccc', lineHeight: 1.8, display: 'block', maxWidth: 500, margin: '0 auto' }}>
-            Tengo 32 anios, soy preparadora fisica de box. Realizo entrenamientos creativos de boxeo adaptados a todos los niveles. Mi objetivo es que cada alumna se supere, se divierta y se sienta fuerte. Te espero en el ring!
-          </Text>
+          <Title level={3} style={{ color: '#fff', margin: '0 0 4px', letterSpacing: 1 }}>TU ENTRENADORA</Title>
+          <Text style={{ fontSize: 16, color: '#ff69b4', display: 'block', marginBottom: 16 }}>Trinidad Guinazu</Text>
+          <Text style={{ fontSize: 13, color: '#aaa', display: 'block', marginBottom: 16 }}>Preparadora fisica y coach de boxeo</Text>
+          <div style={{ background: 'rgba(255,20,147,0.08)', borderRadius: 12, padding: '16px', marginBottom: 20 }}>
+            <Text style={{ fontSize: 15, color: '#eee', lineHeight: 2, display: 'block' }}>
+              Entrenamientos dinamicos adaptados a todos los niveles para mejorar fuerza, tecnica y confianza.
+            </Text>
+          </div>
+          <Row gutter={[12, 12]} style={{ marginBottom: 20 }}>
+            <Col span={8}>
+              <div style={{ background: '#1a1a1a', borderRadius: 10, padding: '12px 8px', border: '1px solid #444' }}>
+                <Text style={{ fontSize: 18, color: '#ff1493', display: 'block', fontWeight: 'bold' }}>+5</Text>
+                <Text style={{ fontSize: 10, color: '#aaa' }}>anios entrenando</Text>
+              </div>
+            </Col>
+            <Col span={8}>
+              <div style={{ background: '#1a1a1a', borderRadius: 10, padding: '12px 8px', border: '1px solid #444' }}>
+                <Text style={{ fontSize: 18, color: '#ff1493', display: 'block', fontWeight: 'bold' }}>+80</Text>
+                <Text style={{ fontSize: 10, color: '#aaa' }}>alumnas</Text>
+              </div>
+            </Col>
+            <Col span={8}>
+              <div style={{ background: '#1a1a1a', borderRadius: 10, padding: '12px 8px', border: '1px solid #444' }}>
+                <Text style={{ fontSize: 18, color: '#ff1493', display: 'block', fontWeight: 'bold' }}>100%</Text>
+                <Text style={{ fontSize: 10, color: '#aaa' }}>personalizado</Text>
+              </div>
+            </Col>
+          </Row>
+          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <Button type="primary" block size="large" style={{ background: '#25d366', borderColor: '#25d366', fontWeight: 'bold', borderRadius: 10 }} href="https://wa.me/5493388414420" target="_blank">
+              WhatsApp
+            </Button>
+            <Button block size="large" icon={<InstagramOutlined />} style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', borderColor: 'transparent', color: '#fff', fontWeight: 'bold', borderRadius: 10 }} href="https://www.instagram.com/femmbox_?igsh=ZDVtMjlrNHB0Nzho" target="_blank">
+              Instagram
+            </Button>
+          </Space>
         </Card>
       )}
 
