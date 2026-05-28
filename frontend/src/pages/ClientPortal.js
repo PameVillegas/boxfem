@@ -99,7 +99,7 @@ function ClientPortal() {
   if (!isLoggedIn) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#1a1a1a', padding: 16, position: 'relative' }}>
-        <Button type="link" size="small" style={{ position: 'absolute', top: 12, right: 12, color: '#666', fontSize: 11 }} href="/login">Admin</Button>
+        <Button type="link" size="small" style={{ position: 'absolute', top: 12, right: 12, color: '#aaa', fontSize: 12, border: '1px solid #555', borderRadius: 6, padding: '2px 10px' }} href="/login">Admin</Button>
         <Card style={{ width: '100%', maxWidth: 380, borderRadius: 16, background: '#2a2a2a', border: 'none' }}>
           <div style={{ textAlign: 'center', marginBottom: 8 }}>
             <Text style={{ color: '#888', fontSize: 12 }}>{todayFormatted}</Text>
