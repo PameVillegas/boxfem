@@ -98,7 +98,8 @@ function ClientPortal() {
   // LOGIN
   if (!isLoggedIn) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#1a1a1a', padding: 16 }}>
+      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#1a1a1a', padding: 16, position: 'relative' }}>
+        <Button type="link" size="small" style={{ position: 'absolute', top: 12, right: 12, color: '#666', fontSize: 11 }} href="/login">Admin</Button>
         <Card style={{ width: '100%', maxWidth: 380, borderRadius: 16, background: '#2a2a2a', border: 'none' }}>
           <div style={{ textAlign: 'center', marginBottom: 8 }}>
             <Text style={{ color: '#888', fontSize: 12 }}>{todayFormatted}</Text>
@@ -358,7 +359,7 @@ function ClientPortal() {
           <motion.div animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }} style={{ display: 'inline-block', fontSize: 48, marginBottom: 12 }}>
             🥊
           </motion.div>
-          <img src="/trini.png" alt="Trinidad" style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', border: '3px solid #ff1493', display: 'block', margin: '0 auto 12px' }} />
+          <img src="/trini.png" alt="Trinidad" style={{ width: 140, height: 140, borderRadius: '50%', objectFit: 'cover', border: '3px solid #ff1493', display: 'block', margin: '0 auto 12px' }} />
           <Title level={3} style={{ color: '#fff', margin: '0 0 4px', letterSpacing: 1 }}>TU ENTRENADORA</Title>
           <Text style={{ fontSize: 16, color: '#ff69b4', display: 'block', marginBottom: 16 }}>Trinidad Guinazu</Text>
           <Text style={{ fontSize: 13, color: '#aaa', display: 'block', marginBottom: 16 }}>Preparadora fisica y coach de boxeo</Text>

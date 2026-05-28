@@ -39,7 +39,7 @@ function AppContent() {
           <Route path="/classes" element={<PrivateRoute><Classes /></PrivateRoute>} />
           <Route path="/attendance" element={<PrivateRoute><Attendance /></PrivateRoute>} />
           <Route path="/whatsapp" element={<PrivateRoute><WhatsAppConfig /></PrivateRoute>} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/portal" replace />} />
         </Routes>
       </Content>
       <Footer style={{ textAlign: 'center', padding: '12px', background: '#1a1a1a', color: '#888' }}>
