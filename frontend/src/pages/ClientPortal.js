@@ -168,6 +168,18 @@ function ClientPortal() {
       </div>
       </FadeIn>
 
+      {/* Navegacion */}
+      <Row gutter={[6, 6]} style={{ marginBottom: 10 }}>
+        {sections.map(s => (
+          <Col span={8} key={s.key}>
+            <Card size="small" style={{ borderRadius: 10, textAlign: 'center', cursor: 'pointer', border: activeSection === s.key ? '2px solid #ff1493' : '1px solid #444', background: activeSection === s.key ? '#3a1a2a' : '#2d2d2d' }} bodyStyle={{ padding: 8 }} onClick={() => setActiveSection(s.key)}>
+              <div style={{ fontSize: 18, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.icon}</div>
+              <Text style={{ fontSize: 10, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.label}</Text>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+
       {/* Frase del dia */}
       {dailyPhrase && (
         <Card size="small" style={{ marginBottom: 10, borderRadius: 10, background: '#2d2d2d', border: '1px solid #ff1493', textAlign: 'center' }}>
@@ -322,18 +334,6 @@ function ClientPortal() {
           )}
         </div>
       </Card>
-
-      {/* Navegacion */}
-      <Row gutter={[6, 6]} style={{ marginBottom: 10 }}>
-        {sections.map(s => (
-          <Col span={8} key={s.key}>
-            <Card size="small" style={{ borderRadius: 10, textAlign: 'center', cursor: 'pointer', border: activeSection === s.key ? '2px solid #ff1493' : '1px solid #444', background: activeSection === s.key ? '#3a1a2a' : '#2d2d2d' }} bodyStyle={{ padding: 8 }} onClick={() => setActiveSection(s.key)}>
-              <div style={{ fontSize: 18, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.icon}</div>
-              <Text style={{ fontSize: 10, color: activeSection === s.key ? '#ff1493' : '#ccc' }}>{s.label}</Text>
-            </Card>
-          </Col>
-        ))}
-      </Row>
 
       <AnimatePresence mode="wait">
       <motion.div key={activeSection} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.25 }}>
