@@ -98,7 +98,7 @@ function ClientPortal() {
   // LOGIN
   if (!isLoggedIn) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#1a1a1a', padding: 16, position: 'relative' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#0d0d0d', padding: 16, position: 'relative' }}>
         <Button type="link" size="small" style={{ position: 'absolute', top: 12, right: 12, color: '#aaa', fontSize: 12, border: '1px solid #555', borderRadius: 6, padding: '2px 10px' }} href="/login">Admin</Button>
         <Card style={{ width: '100%', maxWidth: 380, borderRadius: 16, background: '#2a2a2a', border: 'none' }}>
           <div style={{ textAlign: 'center', marginBottom: 8 }}>
@@ -159,7 +159,7 @@ function ClientPortal() {
   ]
 
   return (
-    <div style={{ minHeight: '100vh', background: '#1a1a1a', padding: 12 }}>
+    <div style={{ minHeight: '100vh', background: '#0d0d0d', padding: 12 }}>
 
       {/* Fecha de hoy */}
       <FadeIn>
@@ -167,13 +167,6 @@ function ClientPortal() {
         <Text style={{ color: '#888', fontSize: 12 }}>{todayFormatted}</Text>
       </div>
       </FadeIn>
-
-      {/* Aviso si hoy tiene turno */}
-      {hasClassToday && (
-        <Card size="small" style={{ marginBottom: 10, borderRadius: 10, background: '#1a3a1a', border: '1px solid #52c41a', textAlign: 'center' }}>
-          <Text style={{ color: '#52c41a', fontSize: 14 }}>🥊 <strong>Hoy es dia de entrenamiento!</strong></Text>
-        </Card>
-      )}
 
       {/* Frase del dia */}
       {dailyPhrase && (
@@ -183,17 +176,22 @@ function ClientPortal() {
       )}
 
       {/* Header con logo */}
-      <Card size="small" style={{ marginBottom: 10, borderRadius: 12, padding: '12px 0', border: '1px solid #ff1493' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 12px' }}>
+      <Card size="small" style={{ marginBottom: 10, borderRadius: 16, padding: '16px 12px', border: '1px solid rgba(255,20,147,0.3)', background: 'rgba(30,30,30,0.8)', backdropFilter: 'blur(10px)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src="/logobox.png" alt="" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ff1493' }} />
+            <img src="/logobox.png" alt="" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ff1493', boxShadow: '0 0 12px rgba(255,20,147,0.4)' }} />
             <div>
-              <Title level={4} style={{ margin: 0, color: '#ff1493' }}>Hola {profile?.name}!</Title>
-              <Text style={{ fontSize: 14, color: '#ff1493' }}>Bienvenida a Femmbox</Text>
+              <Title level={4} style={{ margin: 0, color: '#ff1493', textShadow: '0 0 8px rgba(255,20,147,0.3)' }}>Hola {profile?.name}!</Title>
+              <Text style={{ fontSize: 13, color: '#ff69b4' }}>Bienvenida a Femmbox</Text>
             </div>
           </div>
           <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout} danger size="small" />
         </div>
+        {hasClassToday && (
+          <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(255,20,147,0.1)', borderRadius: 10, border: '1px solid rgba(255,20,147,0.2)' }}>
+            <Text style={{ color: '#ff69b4', fontSize: 13 }}>🥊 <strong>Hoy tenes entrenamiento!</strong></Text>
+          </div>
+        )}
       </Card>
 
       {/* Estado + Sorteo */}

@@ -41,7 +41,9 @@ function Navbar() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        background: 'linear-gradient(90deg, #ff1493, #c2185b)',
+        background: 'rgba(20,20,20,0.85)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(255,20,147,0.2)',
         padding: '0 12px',
         position: 'fixed',
         top: 0,
@@ -56,7 +58,7 @@ function Navbar() {
           onClick={() => navigate('/dashboard')}
         >
           <img src="/logobox.png" alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', marginRight: 8 }} />
-          <span style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>FEMMBOX</span>
+          <span style={{ color: '#ff1493', fontSize: 16, fontWeight: 'bold', textShadow: '0 0 10px rgba(255,20,147,0.5)' }}>FEMMBOX</span>
         </div>
 
         {/* Desktop menu */}

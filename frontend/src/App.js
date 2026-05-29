@@ -30,7 +30,7 @@ function AppContent() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       {user && <Navbar />}
-      <Content style={{ padding: '12px', marginTop: user ? 52 : 0, background: '#1a1a1a', minHeight: 'calc(100vh - 100px)', overflow: 'hidden' }}>
+      <Content style={{ padding: '12px', marginTop: user ? 52 : 0, background: '#0d0d0d', minHeight: 'calc(100vh - 100px)', overflow: 'hidden' }}>
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
@@ -42,7 +42,7 @@ function AppContent() {
           <Route path="/" element={<Navigate to="/portal" replace />} />
         </Routes>
       </Content>
-      <Footer style={{ textAlign: 'center', padding: '12px', background: '#1a1a1a', color: '#888' }}>
+      <Footer style={{ textAlign: 'center', padding: '12px', background: '#0d0d0d', color: '#555' }}>
         FEMMBOX ©2026
       </Footer>
     </Layout>

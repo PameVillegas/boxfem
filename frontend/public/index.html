@@ -4,13 +4,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>FemmBox - Gestión de Gimnasio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-    html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; background: #1a1a1a; color: #fff; }
+    * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+    html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; background: #0d0d0d; color: #fff; }
     #root { overflow-x: hidden; }
+    .ant-card { background: rgba(30,30,30,0.7) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(255,20,147,0.15) !important; box-shadow: 0 4px 24px rgba(255,20,147,0.08) !important; transition: all 0.3s ease !important; }
+    .ant-card:hover { box-shadow: 0 8px 32px rgba(255,20,147,0.15) !important; transform: translateY(-1px); }
+    .ant-btn-primary { background: linear-gradient(135deg, #ff1493, #c2185b) !important; border: none !important; box-shadow: 0 4px 16px rgba(255,20,147,0.3) !important; transition: all 0.2s ease !important; }
+    .ant-btn-primary:hover { transform: scale(1.02); box-shadow: 0 6px 24px rgba(255,20,147,0.4) !important; }
+    .ant-tag { border-radius: 20px !important; }
+    .ant-statistic-title { color: #aaa !important; }
+    .ant-statistic-content { color: #fff !important; }
+    .ant-table { background: transparent !important; }
+    .ant-input, .ant-select-selector, .ant-picker { background: rgba(40,40,40,0.8) !important; border-color: #444 !important; }
+    .ant-modal-content { background: #1e1e1e !important; border: 1px solid rgba(255,20,147,0.2) !important; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #1a1a1a; }
+    ::-webkit-scrollbar-thumb { background: #ff1493; border-radius: 3px; }
   </style>
   <div id="root"></div>
 </body>

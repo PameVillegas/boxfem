@@ -30,20 +30,21 @@ function Login() {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      background: '#1a1a1a'
+      background: '#0d0d0d'
     }}>
       <Card style={{
         width: 400,
         borderRadius: 16,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-        border: 'none',
-        background: '#2a2a2a'
+        boxShadow: '0 8px 32px rgba(255,20,147,0.2)',
+        border: '1px solid rgba(255,20,147,0.2)',
+        background: 'rgba(30,30,30,0.8)',
+        backdropFilter: 'blur(10px)'
       }}>
         <div style={{ textAlign: 'center', marginBottom: 30 }}>
           <img
             src="/logobox.png"
             alt="FemmBox"
-            style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', marginBottom: 16, border: '3px solid #ff1493' }}
+            style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', marginBottom: 16, border: '3px solid #ff1493', boxShadow: '0 0 20px rgba(255,20,147,0.4)' }}
           />
           <Title level={2} style={{ color: '#ff1493', marginBottom: 0 }}>FEMMBOX</Title>
           <Text style={{ color: '#aaa' }}>Gestión de Gimnasio de Boxeo</Text>
