@@ -127,12 +127,15 @@ function ClientPortal() {
         <div>
           {/* Saludo */}
           <motion.div {...stagger(0)}>
-            <div style={{ marginBottom: 20 }}>
-              <Text style={{ color: '#666', fontSize: 12 }}>{dayjs().format('dddd DD MMM').toUpperCase()}</Text>
-              <Title level={3} style={{ margin: '4px 0 0', background: 'linear-gradient(90deg, #ff1493, #ff69b4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Hola {profile?.name}!</Title>
-              <Text style={{ color: '#888', fontSize: 13 }}>
-                {hasClassToday ? 'Hoy tenes entrenamiento 🥊' : monthClasses > 0 ? `Esta semana llevas ${monthClasses} entrenamiento${monthClasses > 1 ? 's' : ''}` : 'Bienvenida de nuevo'}
-              </Text>
+            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <img src="/logobox.png" alt="" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ff1493', boxShadow: '0 0 12px rgba(255,20,147,0.3)' }} />
+              <div>
+                <Text style={{ color: '#666', fontSize: 11 }}>{dayjs().format('dddd DD MMM').toUpperCase()}</Text>
+                <Title level={3} style={{ margin: '2px 0 0', background: 'linear-gradient(90deg, #ff1493, #ff69b4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Hola {profile?.name}!</Title>
+                <Text style={{ color: '#888', fontSize: 13 }}>
+                  {hasClassToday ? 'Hoy tenes entrenamiento 🥊' : monthClasses > 0 ? `Esta semana llevas ${monthClasses} entrenamiento${monthClasses > 1 ? 's' : ''}` : 'Bienvenida de nuevo'}
+                </Text>
+              </div>
             </div>
           </motion.div>
 
@@ -290,6 +293,22 @@ function ClientPortal() {
       {activeTab === 'perfil' && (
         <div>
           <Title level={4} style={{ color: '#ff1493', marginBottom: 16 }}>Perfil</Title>
+
+          {/* Asistencia */}
+          <Card style={{ ...cardBase, padding: 16, marginBottom: 14 }}>
+            <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 10 }}>Mis asistencias</Text>
+            {attendance.length === 0 ? <Text style={{ color: '#444', fontSize: 12 }}>Sin asistencias registradas</Text> : (
+              <div>
+                {attendance.slice(0, 8).map((item, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1a1a1a' }}>
+                    <Text style={{ color: '#ccc', fontSize: 12 }}>{dayjs(item.date).format('DD/MM/YY')} — {item.Class?.name || 'Clase'}</Text>
+                    <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 14 }} />
+                  </div>
+                ))}
+                {attendance.length > 8 && <Text style={{ color: '#555', fontSize: 11, marginTop: 6, display: 'block' }}>+{attendance.length - 8} mas...</Text>}
+              </div>
+            )}
+          </Card>
 
           {/* Profe */}
           <Card style={{ ...cardGlow, padding: 20, marginBottom: 14, textAlign: 'center' }}>
