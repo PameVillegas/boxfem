@@ -211,6 +211,73 @@ function ClientPortal() {
         </Col>
       </Row>
 
+      {/* Streak y Stats */}
+      <Card size="small" style={{ marginBottom: 10, borderRadius: 12, background: 'rgba(30,30,30,0.8)', border: '1px solid rgba(255,20,147,0.15)' }}>
+        <Row gutter={[8, 8]}>
+          <Col span={8} style={{ textAlign: 'center' }}>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring' }}>
+              <Text style={{ fontSize: 24, display: 'block' }}>🔥</Text>
+              <Text style={{ fontSize: 18, color: '#ff1493', fontWeight: 'bold', display: 'block' }}>{attendance.length}</Text>
+              <Text style={{ fontSize: 9, color: '#888' }}>clases este mes</Text>
+            </motion.div>
+          </Col>
+          <Col span={8} style={{ textAlign: 'center' }}>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }}>
+              <Text style={{ fontSize: 24, display: 'block' }}>📈</Text>
+              <Text style={{ fontSize: 18, color: '#ff1493', fontWeight: 'bold', display: 'block' }}>{enrolledDays}x</Text>
+              <Text style={{ fontSize: 9, color: '#888' }}>por semana</Text>
+            </motion.div>
+          </Col>
+          <Col span={8} style={{ textAlign: 'center' }}>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3, type: 'spring' }}>
+              <Text style={{ fontSize: 24, display: 'block' }}>💪</Text>
+              <Text style={{ fontSize: 18, color: '#ff1493', fontWeight: 'bold', display: 'block' }}>{Math.round((attendance.length / (enrolledDays * 4 || 1)) * 100)}%</Text>
+              <Text style={{ fontSize: 9, color: '#888' }}>asistencia</Text>
+            </motion.div>
+          </Col>
+        </Row>
+      </Card>
+
+      {/* Badges / Logros */}
+      <Card size="small" style={{ marginBottom: 10, borderRadius: 12, background: 'rgba(30,30,30,0.8)', border: '1px solid rgba(255,20,147,0.15)' }}>
+        <Text strong style={{ color: '#ff1493', fontSize: 12, display: 'block', marginBottom: 8 }}>Tus logros</Text>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {attendance.length >= 1 && (
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring' }}>
+              <Tag style={{ background: 'rgba(255,20,147,0.15)', border: '1px solid #ff1493', color: '#ff69b4', borderRadius: 20, padding: '4px 10px' }}>🥊 Primera clase</Tag>
+            </motion.div>
+          )}
+          {attendance.length >= 5 && (
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }}>
+              <Tag style={{ background: 'rgba(255,20,147,0.15)', border: '1px solid #ff1493', color: '#ff69b4', borderRadius: 20, padding: '4px 10px' }}>🔥 5 clases</Tag>
+            </motion.div>
+          )}
+          {attendance.length >= 10 && (
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3, type: 'spring' }}>
+              <Tag style={{ background: 'rgba(255,20,147,0.15)', border: '1px solid #ff1493', color: '#ff69b4', borderRadius: 20, padding: '4px 10px' }}>💪 10 clases</Tag>
+            </motion.div>
+          )}
+          {attendance.length >= 20 && (
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4, type: 'spring' }}>
+              <Tag style={{ background: 'rgba(255,20,147,0.15)', border: '1px solid #ff1493', color: '#ff69b4', borderRadius: 20, padding: '4px 10px' }}>⭐ Alumna constante</Tag>
+            </motion.div>
+          )}
+          {enrolledDays >= 3 && (
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5, type: 'spring' }}>
+              <Tag style={{ background: 'rgba(255,20,147,0.15)', border: '1px solid #ff1493', color: '#ff69b4', borderRadius: 20, padding: '4px 10px' }}>🏆 Semana completa</Tag>
+            </motion.div>
+          )}
+          {paidBeforeTen && (
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.6, type: 'spring' }}>
+              <Tag style={{ background: 'rgba(82,196,26,0.15)', border: '1px solid #52c41a', color: '#52c41a', borderRadius: 20, padding: '4px 10px' }}>🎁 En el sorteo</Tag>
+            </motion.div>
+          )}
+          {attendance.length === 0 && (
+            <Text style={{ color: '#666', fontSize: 11 }}>Empeza a entrenar para desbloquear logros!</Text>
+          )}
+        </div>
+      </Card>
+
       {/* Navegacion */}
       <Row gutter={[6, 6]} style={{ marginBottom: 10 }}>
         {sections.map(s => (
