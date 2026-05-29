@@ -112,7 +112,7 @@ function ClientPortal() {
     { key: 'inicio', icon: <HomeOutlined />, label: 'Inicio' },
     { key: 'entrenos', icon: <CalendarOutlined />, label: 'Entrenos' },
     { key: 'pagos', icon: <DollarOutlined />, label: 'Pagos' },
-    { key: 'perfil', icon: <UserOutlined />, label: 'Perfil' }
+    { key: 'perfil', icon: <UserOutlined />, label: 'Quien soy?' }
   ]
 
   return (
