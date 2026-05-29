@@ -152,7 +152,7 @@ function ClientPortal() {
   const sections = [
     { key: 'horarios', icon: <CalendarOutlined />, label: 'Horarios' },
     { key: 'pagos', icon: <DollarOutlined />, label: 'Pagos' },
-    { key: 'asistencia', icon: <CheckCircleOutlined />, label: 'Asistencia' },
+    { key: 'progreso', icon: <CheckCircleOutlined />, label: 'Progreso' },
     { key: 'profe', icon: <UserOutlined />, label: 'Profe' },
     { key: 'ubicacion', icon: <EnvironmentOutlined />, label: 'Ubicacion' },
     { key: 'info', icon: <ClockCircleOutlined />, label: 'Info' }
@@ -210,6 +210,51 @@ function ClientPortal() {
           </Card>
         </Col>
       </Row>
+
+      {/* Notificaciones inteligentes */}
+      <FadeIn delay={0.2}>
+      <div style={{ marginBottom: 10 }}>
+        {attendance.length === 0 && enrolledClasses.length > 0 && (
+          <Card size="small" style={{ borderRadius: 10, background: 'rgba(255,20,147,0.08)', border: '1px solid rgba(255,20,147,0.2)', marginBottom: 6 }}>
+            <Text style={{ color: '#ff69b4', fontSize: 12 }}>💡 Todavia no registraste asistencia este mes. A entrenar!</Text>
+          </Card>
+        )}
+        {enrolledDays === 0 && (
+          <Card size="small" style={{ borderRadius: 10, background: 'rgba(255,165,0,0.08)', border: '1px solid rgba(255,165,0,0.2)', marginBottom: 6 }}>
+            <Text style={{ color: '#ffa500', fontSize: 12 }}>📋 No elegiste tus horarios todavia. Anda a Horarios y arma tu semana!</Text>
+          </Card>
+        )}
+        {!paidBeforeTen && today.date() <= 10 && (
+          <Card size="small" style={{ borderRadius: 10, background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.2)', marginBottom: 6 }}>
+            <Text style={{ color: '#d4a017', fontSize: 12 }}>🎁 Paga antes del {10 - today.date() === 0 ? 'hoy' : `${10 - today.date()} dias`} y entras al sorteo!</Text>
+          </Card>
+        )}
+        {!paidBeforeTen && today.date() > 10 && (
+          <Card size="small" style={{ borderRadius: 10, background: 'rgba(255,77,77,0.08)', border: '1px solid rgba(255,77,77,0.2)', marginBottom: 6 }}>
+            <Text style={{ color: '#ff4d4d', fontSize: 12 }}>⚠️ Recorda abonar tu cuota para seguir entrenando</Text>
+          </Card>
+        )}
+      </div>
+      </FadeIn>
+
+      {/* Progreso mensual */}
+      <FadeIn delay={0.3}>
+      <Card size="small" style={{ marginBottom: 10, borderRadius: 12, background: 'rgba(30,30,30,0.8)', border: '1px solid rgba(255,20,147,0.15)' }}>
+        <Text strong style={{ color: '#ff1493', fontSize: 12, display: 'block', marginBottom: 8 }}>Progreso de {today.format('MMMM')}</Text>
+        <div style={{ background: '#1a1a1a', borderRadius: 8, height: 8, overflow: 'hidden', marginBottom: 6 }}>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.min((attendance.length / (enrolledDays * 4 || 1)) * 100, 100)}%` }}
+            transition={{ duration: 1, delay: 0.5 }}
+            style={{ height: '100%', background: 'linear-gradient(90deg, #ff1493, #ff69b4)', borderRadius: 8 }}
+          />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Text style={{ fontSize: 11, color: '#888' }}>{attendance.length} clases</Text>
+          <Text style={{ fontSize: 11, color: '#888' }}>Meta: {enrolledDays * 4 || '?'}</Text>
+        </div>
+      </Card>
+      </FadeIn>
 
       {/* Streak y Stats */}
       <Card size="small" style={{ marginBottom: 10, borderRadius: 12, background: 'rgba(30,30,30,0.8)', border: '1px solid rgba(255,20,147,0.15)' }}>
@@ -376,14 +421,48 @@ function ClientPortal() {
         </Card>
       )}
 
-      {/* ASISTENCIA */}
-      {activeSection === 'asistencia' && (
+      {/* PROGRESO */}
+      {activeSection === 'progreso' && (
         <Card size="small" style={{ borderRadius: 12 }}>
-          <Title level={5} style={{ color: '#ff1493', marginBottom: 8 }}>Mi Asistencia</Title>
-          <List dataSource={attendance} locale={{ emptyText: <Empty description="Sin asistencias" /> }} renderItem={(item) => (
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #333' }}>
-              <Text style={{ fontSize: 13 }}>{dayjs(item.date).format('DD/MM/YYYY')} - {item.Class?.name || 'Clase'}</Text>
-              <CheckCircleOutlined style={{ color: 'green' }} />
+          <Title level={5} style={{ color: '#ff1493', marginBottom: 12 }}>Mi Progreso</Title>
+
+          {/* Barra de progreso grande */}
+          <Card size="small" style={{ marginBottom: 12, background: 'rgba(30,30,30,0.8)', border: '1px solid rgba(255,20,147,0.2)', textAlign: 'center' }}>
+            <Text style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 8 }}>Asistencia este mes</Text>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
+              <Text style={{ fontSize: 36, color: '#ff1493', fontWeight: 'bold', display: 'block' }}>{attendance.length}</Text>
+            </motion.div>
+            <Text style={{ fontSize: 12, color: '#aaa' }}>clases completadas</Text>
+            <div style={{ background: '#1a1a1a', borderRadius: 8, height: 10, overflow: 'hidden', margin: '12px 0 6px' }}>
+              <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min((attendance.length / (enrolledDays * 4 || 1)) * 100, 100)}%` }} transition={{ duration: 1.2 }} style={{ height: '100%', background: 'linear-gradient(90deg, #ff1493, #ff69b4, #c2185b)', borderRadius: 8 }} />
+            </div>
+            <Text style={{ fontSize: 11, color: '#666' }}>Meta mensual: {enrolledDays * 4} clases</Text>
+          </Card>
+
+          {/* Records */}
+          <Row gutter={[8, 8]} style={{ marginBottom: 12 }}>
+            <Col span={12}>
+              <Card size="small" style={{ textAlign: 'center', borderRadius: 10 }}>
+                <Text style={{ fontSize: 20, display: 'block' }}>🏆</Text>
+                <Text style={{ fontSize: 16, color: '#ff1493', fontWeight: 'bold', display: 'block' }}>{attendance.length}</Text>
+                <Text style={{ fontSize: 10, color: '#888' }}>Total historico</Text>
+              </Card>
+            </Col>
+            <Col span={12}>
+              <Card size="small" style={{ textAlign: 'center', borderRadius: 10 }}>
+                <Text style={{ fontSize: 20, display: 'block' }}>📅</Text>
+                <Text style={{ fontSize: 16, color: '#ff1493', fontWeight: 'bold', display: 'block' }}>{enrolledDays}x</Text>
+                <Text style={{ fontSize: 10, color: '#888' }}>Dias por semana</Text>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Historial */}
+          <Text strong style={{ color: '#ff1493', fontSize: 12, display: 'block', marginBottom: 8 }}>Ultimas asistencias</Text>
+          <List dataSource={attendance.slice(0, 10)} locale={{ emptyText: <Empty description="Sin asistencias aun" /> }} renderItem={(item) => (
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #222' }}>
+              <Text style={{ fontSize: 12, color: '#ccc' }}>{dayjs(item.date).format('DD/MM/YYYY')} - {item.Class?.name || 'Clase'}</Text>
+              <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 14 }} />
             </div>
           )} />
         </Card>
