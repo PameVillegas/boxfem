@@ -217,7 +217,7 @@ function ClientPortal() {
                     const isToday = d === dayjs().date()
                     cells.push(
                       <div key={d} style={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', background: attended ? '#ff1493' : isToday ? '#222' : 'transparent', border: isToday && !attended ? '1px solid #ff1493' : 'none' }}>
-                        <Text style={{ fontSize: 11, color: attended ? '#fff' : isToday ? '#ff1493' : '#555' }}>{d}</Text>
+                        {attended ? <span style={{ fontSize: 14 }}>🥊</span> : <Text style={{ fontSize: 11, color: isToday ? '#ff1493' : '#555' }}>{d}</Text>}
                       </div>
                     )
                   }
@@ -225,7 +225,7 @@ function ClientPortal() {
                 })()}
               </div>
               <div style={{ display: 'flex', gap: 12, marginTop: 10, justifyContent: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff1493' }} /><Text style={{ color: '#666', fontSize: 10 }}>Entrene</Text></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ fontSize: 10 }}>🥊</span><Text style={{ color: '#666', fontSize: 10 }}>Entrene</Text></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 8, height: 8, borderRadius: '50%', border: '1px solid #ff1493' }} /><Text style={{ color: '#666', fontSize: 10 }}>Hoy</Text></div>
               </div>
             </Card>
