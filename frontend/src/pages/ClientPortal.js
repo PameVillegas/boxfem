@@ -106,7 +106,7 @@ function ClientPortal() {
   const monthGoal = enrolledDays * 4 || 4
   const progress = Math.min(Math.round((monthClasses / monthGoal) * 100), 100)
   const classesByDay = {}; classes.forEach(c => { const d = c.dayOfWeek || 'x'; if (!classesByDay[d]) classesByDay[d] = []; classesByDay[d].push(c) })
-  const dayNames = { monday: 'Lunes', wednesday: 'Miercoles', friday: 'Viernes' }
+  const dayNames = { monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miercoles', thursday: 'Jueves', friday: 'Viernes' }
   const whatsappLink = `https://wa.me/5493388414420?text=${encodeURIComponent('Hola! Te envio mi comprobante de pago')}`
 
   // Bottom nav tabs
@@ -266,10 +266,10 @@ function ClientPortal() {
       {activeTab === 'entrenos' && (
         <div>
           <Title level={4} style={{ color: '#ff1493', marginBottom: 16 }}>Mis Horarios</Title>
-          <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 12 }}>Clase de Boxeo y Funcional</Text>
+          <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 12 }}>Lunes: Piernas y Gluteos | Miercoles: Espalda, Brazos y Boxeo | Viernes: Resistencia</Text>
           {enrolledClasses.length > 0 && !showEditTurnos && (
             <Card style={{ ...cardGlow, padding: 16, marginBottom: 14 }}>
-              {['monday', 'wednesday', 'friday'].map(day => {
+              {['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].map(day => {
                 const my = enrolledClasses.filter(c => c.dayOfWeek === day)
                 if (!my.length) return null
                 return <div key={day} style={{ marginBottom: 6 }}><Text style={{ color: '#fff', fontSize: 14 }}><strong style={{ color: '#ff1493' }}>{dayNames[day]}</strong> — {my.map(c => c.startTime + '-' + c.endTime).join(', ')}</Text></div>
@@ -287,7 +287,7 @@ function ClientPortal() {
               {enrolledDays === 1 && <Alert style={{ marginBottom: 10, borderRadius: 10 }} type="warning" showIcon message="Otro dia = 2x sem ($25.000)" />}
               {enrolledDays === 2 && <Alert style={{ marginBottom: 10, borderRadius: 10 }} type="warning" showIcon message="Otro dia = 3x sem ($30.000) +$5.000" />}
               {enrolledDays === 3 && <Alert style={{ marginBottom: 10, borderRadius: 10 }} type="warning" showIcon message="Otro dia = Completa ($35.000) +$5.000" />}
-              {['monday', 'wednesday', 'friday'].map(day => {
+              {['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].map(day => {
                 const dc = (classesByDay[day] || []).sort((a, b) => a.startTime.localeCompare(b.startTime))
                 return (
                   <div key={day} style={{ marginBottom: 14 }}>
