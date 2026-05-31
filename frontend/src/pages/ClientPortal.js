@@ -266,7 +266,7 @@ function ClientPortal() {
       {activeTab === 'entrenos' && (
         <div>
           <Title level={4} style={{ color: '#ff1493', marginBottom: 16 }}>Mis Horarios</Title>
-          <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 12 }}>Lunes: Piernas y Gluteos | Miercoles: Espalda, Brazos y Boxeo | Viernes: Resistencia</Text>
+          <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 12 }}>Lunes: Piernas y Gluteos | Martes y Jueves: Entrenamiento Fisico | Miercoles: Espalda, Brazos y Boxeo | Viernes: Resistencia</Text>
           {enrolledClasses.length > 0 && !showEditTurnos && (
             <Card style={{ ...cardGlow, padding: 16, marginBottom: 14 }}>
               {['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].map(day => {
