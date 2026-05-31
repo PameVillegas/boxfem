@@ -356,10 +356,10 @@ function ClientPortal() {
             <Title level={5} style={{ color: '#fff', margin: '8px 0 2px' }}>TU ENTRENADORA</Title>
             <Text style={{ color: '#ff69b4', fontSize: 13 }}>Trinidad Guinazu</Text>
             <Text style={{ color: '#666', fontSize: 12, display: 'block', marginTop: 4 }}>Preparadora fisica y coach de boxeo</Text>
-            <Text style={{ color: '#888', fontSize: 12, display: 'block', marginTop: 8, lineHeight: 1.6 }}>Entrenamientos dinamicos adaptados a todos los niveles</Text>
+            <Text style={{ color: '#888', fontSize: 12, display: 'block', marginTop: 8, lineHeight: 1.6 }}>Entrenamientos dinamicos adaptados a todos los niveles. Estudiante de la FAB (Federacion Argentina de Boxeo). Certificacion de Preparador Fisico de la CIE-DC.</Text>
             <Row gutter={[8, 8]} style={{ marginTop: 12 }}>
-              <Col span={8}><Text style={{ color: '#ff1493', fontWeight: 'bold', display: 'block' }}>+5</Text><Text style={{ color: '#555', fontSize: 9 }}>anios</Text></Col>
-              <Col span={8}><Text style={{ color: '#ff1493', fontWeight: 'bold', display: 'block' }}>+80</Text><Text style={{ color: '#555', fontSize: 9 }}>alumnas</Text></Col>
+              <Col span={8}><Text style={{ color: '#ff1493', fontWeight: 'bold', display: 'block' }}>+1</Text><Text style={{ color: '#555', fontSize: 9 }}>anio</Text></Col>
+              <Col span={8}><Text style={{ color: '#ff1493', fontWeight: 'bold', display: 'block' }}>+50</Text><Text style={{ color: '#555', fontSize: 9 }}>alumnas</Text></Col>
               <Col span={8}><Text style={{ color: '#ff1493', fontWeight: 'bold', display: 'block' }}>100%</Text><Text style={{ color: '#555', fontSize: 9 }}>personal</Text></Col>
             </Row>
             <Space style={{ marginTop: 14 }}>
