@@ -4,6 +4,8 @@ import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCirc
 import { portalAPI, phrasesAPI } from '../services/api'
 import { motion, AnimatePresence } from 'framer-motion'
 import dayjs from 'dayjs'
+import 'dayjs/locale/es'
+dayjs.locale('es')
 
 const { Title, Text } = Typography
 
@@ -142,7 +144,7 @@ function ClientPortal() {
           {/* Progreso principal */}
           <motion.div {...stagger(1)}>
             <Card style={{ ...cardGlow, padding: 20, marginBottom: 14 }}>
-              <Text style={{ color: '#888', fontSize: 12 }}>Tu progreso del mes</Text>
+              <Text style={{ color: '#fff', fontSize: 12 }}>Tu progreso del mes</Text>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 12 }}>
                 <div style={{ position: 'relative', width: 64, height: 64 }}>
                   <svg width="64" height="64" style={{ transform: 'rotate(-90deg)' }}>
@@ -197,15 +199,15 @@ function ClientPortal() {
           {/* Calendario visual */}
           <motion.div {...stagger(4)}>
             <Card style={{ ...cardBase, padding: 16, marginBottom: 14 }}>
-              <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 10 }}>Este mes</Text>
+              <Text style={{ color: '#fff', fontSize: 12, display: 'block', marginBottom: 10 }}>Este mes</Text>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, textAlign: 'center' }}>
-                {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map(d => (
+                {['D', 'L', 'M', 'X', 'J', 'V', 'S'].map(d => (
                   <Text key={d} style={{ color: '#555', fontSize: 10, marginBottom: 4 }}>{d}</Text>
                 ))}
                 {(() => {
                   const startOfMonth = dayjs().startOf('month')
                   const daysInMonth = dayjs().daysInMonth()
-                  const startDay = startOfMonth.day() === 0 ? 6 : startOfMonth.day() - 1
+                  const startDay = startOfMonth.day()
                   const attendedDates = new Set(attendance.map(a => dayjs(a.date).format('YYYY-MM-DD')))
                   const cells = []
                   for (let i = 0; i < startDay; i++) cells.push(<div key={`empty-${i}`} />)
@@ -232,7 +234,7 @@ function ClientPortal() {
           {/* Logros */}
           <motion.div {...stagger(5)}>
             <Card style={{ ...cardBase, padding: 16, marginBottom: 14 }}>
-              <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 10 }}>Logros</Text>
+              <Text style={{ color: '#fff', fontSize: 12, display: 'block', marginBottom: 10 }}>Logros</Text>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {monthClasses >= 1 && <Tag style={{ background: '#1a1a1a', border: '1px solid #ff1493', color: '#ff69b4', borderRadius: 20 }}>🥊 1ra clase</Tag>}
                 {monthClasses >= 5 && <Tag style={{ background: '#1a1a1a', border: '1px solid #ff1493', color: '#ff69b4', borderRadius: 20 }}>🔥 5 clases</Tag>}
@@ -404,3 +406,4 @@ function ClientPortal() {
 }
 
 export default ClientPortal
+
