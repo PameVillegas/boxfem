@@ -229,6 +229,7 @@ function ClientPortal() {
       {activeTab === 'entrenos' && (
         <div>
           <Title level={4} style={{ color: '#ff1493', marginBottom: 16 }}>Mis Horarios</Title>
+          <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 12 }}>Clase de Boxeo y Funcional</Text>
           {enrolledClasses.length > 0 && !showEditTurnos && (
             <Card style={{ ...cardGlow, padding: 16, marginBottom: 14 }}>
               {['monday', 'wednesday', 'friday'].map(day => {
