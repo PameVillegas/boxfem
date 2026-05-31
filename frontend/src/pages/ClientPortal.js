@@ -194,6 +194,41 @@ function ClientPortal() {
             </motion.div>
           )}
 
+          {/* Calendario visual */}
+          <motion.div {...stagger(4)}>
+            <Card style={{ ...cardBase, padding: 16, marginBottom: 14 }}>
+              <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 10 }}>Este mes</Text>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, textAlign: 'center' }}>
+                {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map(d => (
+                  <Text key={d} style={{ color: '#555', fontSize: 10, marginBottom: 4 }}>{d}</Text>
+                ))}
+                {(() => {
+                  const startOfMonth = dayjs().startOf('month')
+                  const daysInMonth = dayjs().daysInMonth()
+                  const startDay = startOfMonth.day() === 0 ? 6 : startOfMonth.day() - 1
+                  const attendedDates = new Set(attendance.map(a => dayjs(a.date).format('YYYY-MM-DD')))
+                  const cells = []
+                  for (let i = 0; i < startDay; i++) cells.push(<div key={`empty-${i}`} />)
+                  for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = dayjs().date(d).format('YYYY-MM-DD')
+                    const attended = attendedDates.has(dateStr)
+                    const isToday = d === dayjs().date()
+                    cells.push(
+                      <div key={d} style={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', background: attended ? '#ff1493' : isToday ? '#222' : 'transparent', border: isToday && !attended ? '1px solid #ff1493' : 'none' }}>
+                        <Text style={{ fontSize: 11, color: attended ? '#fff' : isToday ? '#ff1493' : '#555' }}>{d}</Text>
+                      </div>
+                    )
+                  }
+                  return cells
+                })()}
+              </div>
+              <div style={{ display: 'flex', gap: 12, marginTop: 10, justifyContent: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff1493' }} /><Text style={{ color: '#666', fontSize: 10 }}>Entrene</Text></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 8, height: 8, borderRadius: '50%', border: '1px solid #ff1493' }} /><Text style={{ color: '#666', fontSize: 10 }}>Hoy</Text></div>
+              </div>
+            </Card>
+          </motion.div>
+
           {/* Logros */}
           <motion.div {...stagger(5)}>
             <Card style={{ ...cardBase, padding: 16, marginBottom: 14 }}>
