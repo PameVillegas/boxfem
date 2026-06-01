@@ -8,6 +8,7 @@
     "axios": "^1.6.2",
     "dayjs": "^1.11.10",
     "framer-motion": "^12.40.0",
+    "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0",
@@ -18,7 +19,6 @@
     "start": "react-scripts start",
     "build": "react-scripts build"
   },
-  "devDependencies": {},
   "browserslist": {
     "production": [
       ">0.2%",

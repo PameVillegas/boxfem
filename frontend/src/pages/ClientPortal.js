@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, Typography, Input, Button, message, Tag, List, Space, Spin, Empty, Row, Col, Alert } from 'antd'
 import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined, EnvironmentOutlined, InstagramOutlined, HomeOutlined, TrophyOutlined } from '@ant-design/icons'
-import { portalAPI, phrasesAPI } from '../services/api'
+import { portalAPI, phrasesAPI, attendanceAPI } from '../services/api'
 import { motion, AnimatePresence } from 'framer-motion'
 import dayjs from 'dayjs'
 import 'dayjs/locale/es'
@@ -36,6 +36,13 @@ function ClientPortal() {
     const token = localStorage.getItem('clientToken')
     if (token) { setIsLoggedIn(true); loadData(token) }
     loadPhrase()
+    // Detectar QR de asistencia en la URL
+    const params = new URLSearchParams(window.location.search)
+    const qrToken = params.get('qr')
+    if (qrToken) {
+      localStorage.setItem('pendingQR', qrToken)
+      window.history.replaceState({}, '', '/portal')
+    }
   }, [])
 
   const loadPhrase = async () => { try { const r = await phrasesAPI.getToday(); setDailyPhrase(r.data.phrase || '') } catch(e) {} }
@@ -57,6 +64,16 @@ function ClientPortal() {
     try {
       const [p, pay, c, a] = await Promise.all([portalAPI.getProfile(config), portalAPI.getPayments(config), portalAPI.getClasses(config), portalAPI.getAttendance(config)])
       setProfile(p.data); setPayments(pay.data); setClasses(c.data); setAttendance(a.data)
+      // Procesar QR pendiente
+      const pendingQR = localStorage.getItem('pendingQR')
+      if (pendingQR && p.data.id) {
+        try {
+          const res = await attendanceAPI.qrCheckIn(pendingQR, p.data.id)
+          if (res.data.success) message.success('Asistencia registrada!')
+          else message.info(res.data.message || 'Ya registrada')
+        } catch (e) { message.error(e.response?.data?.error || 'Error con QR') }
+        localStorage.removeItem('pendingQR')
+      }
     } catch (e) { if (e.response?.status === 401) handleLogout() }
     finally { setDataLoading(false) }
   }

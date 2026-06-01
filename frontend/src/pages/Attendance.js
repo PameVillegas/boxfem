@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Typography, Select, Button, Tag, message, Card, Row, Col, Checkbox } from 'antd'
-import { CheckCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, PlusOutlined, QrcodeOutlined } from '@ant-design/icons'
 import { attendanceAPI, clientsAPI, classesAPI } from '../services/api'
 import dayjs from 'dayjs'
 import 'dayjs/locale/es'
@@ -17,6 +17,7 @@ function Attendance() {
   const [checkedIds, setCheckedIds] = useState([])
   const [extraClient, setExtraClient] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [qrData, setQrData] = useState(null)
 
   useEffect(() => { loadAll() }, [])
 
@@ -196,11 +197,26 @@ function Attendance() {
         </Card>
       )}
 
-      {/* Boton guardar */}
+      {/* Botones */}
       {selectedClass && (
-        <Button type="primary" block size="large" onClick={handleSave} loading={saving} style={{ borderRadius: 12, height: 48, fontSize: 16 }}>
-          Registrar Asistencia ({checkedIds.length})
-        </Button>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+          <Button type="primary" block size="large" onClick={handleSave} loading={saving} style={{ borderRadius: 12, height: 48, fontSize: 16, flex: 2 }}>
+            Registrar ({checkedIds.length})
+          </Button>
+          <Button size="large" icon={<QrcodeOutlined />} onClick={async () => { try { const res = await attendanceAPI.getQR(selectedClass); setQrData(res.data) } catch(e) { message.error('Error generando QR') } }} style={{ borderRadius: 12, height: 48, flex: 1 }}>
+            QR
+          </Button>
+        </div>
+      )}
+
+      {/* QR del turno */}
+      {qrData && (
+        <Card size="small" style={{ marginBottom: 12, borderRadius: 12, textAlign: 'center' }}>
+          <Text strong style={{ display: 'block', marginBottom: 8 }}>QR para: {qrData.className} ({qrData.time})</Text>
+          <img src={qrData.qr} alt="QR" style={{ width: 200, height: 200, borderRadius: 8 }} />
+          <Text style={{ display: 'block', marginTop: 8, color: '#888', fontSize: 11 }}>Las alumnas escanean este QR desde su celular para registrar asistencia</Text>
+          <Button size="small" style={{ marginTop: 8 }} onClick={() => setQrData(null)}>Cerrar</Button>
+        </Card>
       )}
 
       {/* Resumen de hoy */}

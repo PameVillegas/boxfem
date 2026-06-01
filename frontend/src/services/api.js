@@ -54,7 +54,9 @@ export const classesAPI = {
 export const attendanceAPI = {
   getAll: (date) => api.get(`/attendance?date=${date || ''}`),
   checkIn: (data) => api.post('/attendance/checkin', data),
-  getByClient: (id) => api.get(`/attendance/client/${id}`)
+  getByClient: (id) => api.get(`/attendance/client/${id}`),
+  getQR: (classId) => api.get(`/attendance/qr/${classId}`),
+  qrCheckIn: (token, clientId) => api.post('/attendance/qr-checkin', { token, clientId })
 }
 
 export const dashboardAPI = {
