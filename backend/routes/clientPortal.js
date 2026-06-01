@@ -16,8 +16,8 @@ router.post('/login', async (req, res) => {
 
     const client = await Client.findOne({
       where: {
-        name: { [Op.iLike]: name.trim() },
-        lastName: { [Op.iLike]: lastName.trim() },
+        name: { [Op.iLike]: name.trim().replace(/\s+/g, ' ') },
+        lastName: { [Op.iLike]: lastName.trim().replace(/\s+/g, ' ') },
         personalCode: code.trim()
       }
     })

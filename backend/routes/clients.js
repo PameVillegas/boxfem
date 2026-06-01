@@ -38,7 +38,10 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const client = await Client.create(req.body)
+    const data = { ...req.body }
+    if (data.name) data.name = data.name.trim()
+    if (data.lastName) data.lastName = data.lastName.trim()
+    const client = await Client.create(data)
     res.status(201).json(client)
   } catch (error) {
     res.status(400).json({ error: error.message })
