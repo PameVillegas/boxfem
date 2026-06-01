@@ -88,6 +88,56 @@ router.post('/qr-checkin', async (req, res) => {
   }
 })
 
+// QR fijo para imprimir (no expira, registra asistencia del dia actual)
+router.get('/qr-fixed', async (req, res) => {
+  try {
+    const host = req.headers.host
+    const protocol = req.headers['x-forwarded-proto'] || 'https'
+    const url = `${protocol}://${host}/portal?checkin=auto`
+
+    const qrImage = await QRCode.toDataURL(url, { width: 400, margin: 2 })
+    res.json({ qr: qrImage, url })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Registrar asistencia via QR fijo (detecta turno automaticamente)
+router.post('/qr-auto-checkin', async (req, res) => {
+  try {
+    const { clientId } = req.body
+    const client = await Client.findByPk(clientId)
+    if (!client || client.status !== 'active') return res.status(400).json({ error: 'Cuota vencida' })
+
+    const today = dayjs().format('YYYY-MM-DD')
+    const hour = dayjs().hour()
+    const dayName = dayjs().format('dddd').toLowerCase()
+    const dayMap = { monday: 'monday', tuesday: 'tuesday', wednesday: 'wednesday', thursday: 'thursday', friday: 'friday', lunes: 'monday', martes: 'tuesday', miercoles: 'wednesday', jueves: 'thursday', viernes: 'friday' }
+    const todayEng = dayMap[dayName] || ''
+
+    // Buscar la clase mas cercana a la hora actual
+    const todayClasses = await Class.findAll({ where: { dayOfWeek: todayEng, active: true } })
+    let bestClass = null
+    let bestDiff = 999
+    todayClasses.forEach(c => {
+      const startHour = parseInt(c.startTime.split(':')[0])
+      const diff = Math.abs(hour - startHour)
+      if (diff < bestDiff) { bestDiff = diff; bestClass = c }
+    })
+
+    const classId = bestClass ? bestClass.id : null
+
+    // Evitar duplicados
+    const existing = await Attendance.findOne({ where: { clientId, date: today, ...(classId ? { classId } : {}) } })
+    if (existing) return res.json({ message: 'Ya registrada hoy', attendance: existing })
+
+    const attendance = await Attendance.create({ clientId, classId, method: 'qr', date: today })
+    res.json({ success: true, message: 'Asistencia registrada!', className: bestClass?.name || 'Clase', attendance })
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+  }
+})
+
 router.get('/client/:id', async (req, res) => {
   try {
     const attendance = await Attendance.findAll({

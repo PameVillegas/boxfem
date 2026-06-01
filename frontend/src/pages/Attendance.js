@@ -215,9 +215,18 @@ function Attendance() {
           <Text strong style={{ display: 'block', marginBottom: 8 }}>QR para: {qrData.className} ({qrData.time})</Text>
           <img src={qrData.qr} alt="QR" style={{ width: 200, height: 200, borderRadius: 8 }} />
           <Text style={{ display: 'block', marginTop: 8, color: '#888', fontSize: 11 }}>Las alumnas escanean este QR desde su celular para registrar asistencia</Text>
+          <Text style={{ display: 'block', color: '#ff1493', fontSize: 11 }}>Expira en 2 horas</Text>
           <Button size="small" style={{ marginTop: 8 }} onClick={() => setQrData(null)}>Cerrar</Button>
         </Card>
       )}
+
+      {/* QR fijo para imprimir */}
+      <Card size="small" style={{ marginBottom: 12, borderRadius: 12 }}>
+        <Button block onClick={async () => { try { const res = await attendanceAPI.getFixedQR(); setQrData({ ...res.data, className: 'FEMMBOX - Asistencia', time: 'Fijo' }) } catch(e) { message.error('Error') } }} style={{ borderRadius: 10 }}>
+          🖨️ Generar QR fijo para imprimir
+        </Button>
+        <Text style={{ display: 'block', marginTop: 6, color: '#666', fontSize: 11, textAlign: 'center' }}>Este QR no expira. Pegalo en el gym y las alumnas lo escanean al llegar.</Text>
+      </Card>
 
       {/* Resumen de hoy */}
       {todayAttendance.length > 0 && (

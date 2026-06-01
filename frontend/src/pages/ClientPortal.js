@@ -39,8 +39,13 @@ function ClientPortal() {
     // Detectar QR de asistencia en la URL
     const params = new URLSearchParams(window.location.search)
     const qrToken = params.get('qr')
+    const autoCheckin = params.get('checkin')
     if (qrToken) {
       localStorage.setItem('pendingQR', qrToken)
+      window.history.replaceState({}, '', '/portal')
+    }
+    if (autoCheckin === 'auto') {
+      localStorage.setItem('pendingAutoCheckin', 'true')
       window.history.replaceState({}, '', '/portal')
     }
   }, [])
@@ -73,6 +78,16 @@ function ClientPortal() {
           else message.info(res.data.message || 'Ya registrada')
         } catch (e) { message.error(e.response?.data?.error || 'Error con QR') }
         localStorage.removeItem('pendingQR')
+      }
+      // Procesar auto-checkin (QR fijo)
+      const pendingAuto = localStorage.getItem('pendingAutoCheckin')
+      if (pendingAuto && p.data.id) {
+        try {
+          const res = await attendanceAPI.autoCheckIn(p.data.id)
+          if (res.data.success) message.success('Asistencia registrada! ' + (res.data.className || ''))
+          else message.info(res.data.message || 'Ya registrada hoy')
+        } catch (e) { message.error(e.response?.data?.error || 'Error') }
+        localStorage.removeItem('pendingAutoCheckin')
       }
     } catch (e) { if (e.response?.status === 401) handleLogout() }
     finally { setDataLoading(false) }

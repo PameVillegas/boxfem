@@ -56,7 +56,9 @@ export const attendanceAPI = {
   checkIn: (data) => api.post('/attendance/checkin', data),
   getByClient: (id) => api.get(`/attendance/client/${id}`),
   getQR: (classId) => api.get(`/attendance/qr/${classId}`),
-  qrCheckIn: (token, clientId) => api.post('/attendance/qr-checkin', { token, clientId })
+  getFixedQR: () => api.get('/attendance/qr-fixed'),
+  qrCheckIn: (token, clientId) => api.post('/attendance/qr-checkin', { token, clientId }),
+  autoCheckIn: (clientId) => api.post('/attendance/qr-auto-checkin', { clientId })
 }
 
 export const dashboardAPI = {
