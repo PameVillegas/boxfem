@@ -55,6 +55,10 @@ function Clients() {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields()
+      // Formatear fecha
+      if (values.expirationDate && values.expirationDate.format) {
+        values.expirationDate = values.expirationDate.format('YYYY-MM-DD')
+      }
       if (selectedClient) {
         await clientsAPI.update(selectedClient.id, values)
         message.success('Cliente actualizado')
@@ -62,7 +66,7 @@ function Clients() {
       } else {
         // Generar código personal automáticamente
         const code = generateCode()
-        const res = await clientsAPI.create({ ...values, personalCode: code })
+        await clientsAPI.create({ ...values, personalCode: code })
         setNewClientCode({ name: values.name, lastName: values.lastName, code })
         setModalVisible(false)
       }
@@ -157,7 +161,7 @@ function Clients() {
           message={`Código de acceso para ${newClientCode?.name} ${newClientCode?.lastName}`}
           description={
             <div style={{ textAlign: 'center', marginTop: 12 }}>
-              <div style={{ fontSize: 32, fontWeight: 'bold', letterSpacing: 6, fontFamily: 'monospace', background: '#f0f5ff', padding: '12px 24px', borderRadius: 8, display: 'inline-block' }}>
+              <div style={{ fontSize: 32, fontWeight: 'bold', letterSpacing: 6, fontFamily: 'monospace', background: '#0a0a0a', color: '#ff1493', padding: '16px 28px', borderRadius: 12, display: 'inline-block', border: '2px solid #ff1493', boxShadow: '0 0 20px rgba(255,20,147,0.3)' }}>
                 {newClientCode?.code}
               </div>
               <p style={{ marginTop: 12, color: '#666' }}>
