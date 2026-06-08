@@ -151,4 +151,14 @@ router.get('/client/:id', async (req, res) => {
   }
 })
 
+// Eliminar asistencia
+router.delete('/:id', async (req, res) => {
+  try {
+    await Attendance.destroy({ where: { id: req.params.id } })
+    res.json({ success: true })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 module.exports = router
