@@ -4,7 +4,7 @@ import { DollarOutlined, PlusOutlined } from '@ant-design/icons'
 import { paymentsAPI, clientsAPI } from '../services/api'
 import dayjs from 'dayjs'
 
-const { Title } = Typography
+const { Title, Text } = Typography
 
 function Payments() {
   const [payments, setPayments] = useState([])
@@ -13,6 +13,7 @@ function Payments() {
   const [month, setMonth] = useState(dayjs().month() + 1)
   const [year, setYear] = useState(dayjs().year())
   const [modalVisible, setModalVisible] = useState(false)
+  const [filter, setFilter] = useState('all')
   const [form] = Form.useForm()
 
   useEffect(() => { loadPayments(); loadClients() }, [month, year])
@@ -90,6 +91,41 @@ function Payments() {
           </Card>
         </Col>
       </Row>
+
+      {/* Filtros + Pendientes */}
+      <Card size="small" style={{ marginBottom: 12, borderRadius: 12 }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+          <Button size="small" type={filter === 'all' ? 'primary' : 'default'} onClick={() => setFilter('all')} style={{ borderRadius: 8 }}>Todos</Button>
+          <Button size="small" type={filter === 'paid' ? 'primary' : 'default'} onClick={() => setFilter('paid')} style={{ borderRadius: 8 }}>Al dia</Button>
+          <Button size="small" type={filter === 'pending' ? 'primary' : 'default'} onClick={() => setFilter('pending')} style={{ borderRadius: 8, background: filter === 'pending' ? '#ff4d4f' : undefined, borderColor: filter === 'pending' ? '#ff4d4f' : undefined }}>Pendientes</Button>
+        </div>
+        {filter === 'pending' && (
+          <div>
+            <Text style={{ fontSize: 12, color: '#ff4d4f', display: 'block', marginBottom: 8 }}>Alumnas con cuota vencida:</Text>
+            {clients.filter(c => c.status === 'expired').length === 0 ? (
+              <Text style={{ color: '#52c41a', fontSize: 12 }}>Todas al dia!</Text>
+            ) : (
+              clients.filter(c => c.status === 'expired').map(c => (
+                <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1a1a1a' }}>
+                  <Text style={{ fontSize: 13 }}>{c.name} {c.lastName}</Text>
+                  <Text style={{ fontSize: 11, color: '#ff4d4f' }}>Vencio {dayjs(c.expirationDate).format('DD/MM')}</Text>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+        {filter === 'paid' && (
+          <div>
+            <Text style={{ fontSize: 12, color: '#52c41a', display: 'block', marginBottom: 8 }}>Alumnas al dia:</Text>
+            {clients.filter(c => c.status === 'active').map(c => (
+              <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1a1a1a' }}>
+                <Text style={{ fontSize: 13 }}>{c.name} {c.lastName}</Text>
+                <Text style={{ fontSize: 11, color: '#52c41a' }}>Vence {dayjs(c.expirationDate).format('DD/MM')}</Text>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
 
       <div style={{ overflowX: 'auto' }}>
         <Table dataSource={payments} columns={columns} rowKey="id" size="small" scroll={{ x: 450 }} pagination={{ pageSize: 15, size: 'small' }} />
