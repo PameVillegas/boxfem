@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Table, Typography, DatePicker, Statistic, Row, Col, Card, Tag, Button, Modal, Form, Input, Select, message } from 'antd'
-import { DollarOutlined, PlusOutlined } from '@ant-design/icons'
+import { Table, Typography, DatePicker, Statistic, Row, Col, Card, Tag, Button, Modal, Form, Input, Select, message, Popconfirm } from 'antd'
+import { DollarOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { paymentsAPI, clientsAPI } from '../services/api'
 import dayjs from 'dayjs'
 
@@ -52,6 +52,14 @@ function Payments() {
     }
   }
 
+  const handleDelete = async (id) => {
+    try {
+      await paymentsAPI.remove(id)
+      message.success('Pago eliminado')
+      loadPayments()
+    } catch (e) { message.error('Error') }
+  }
+
   const methodLabels = { cash: 'Efectivo', transfer: 'Transferencia', card: 'Tarjeta', mercadopago: 'MercadoPago' }
 
   const columns = [
@@ -62,7 +70,12 @@ function Payments() {
     }},
     { title: 'Monto', dataIndex: 'amount', render: (v) => `$${v}`, width: 80 },
     { title: 'Método', dataIndex: 'paymentMethod', render: (m) => <Tag>{methodLabels[m] || m}</Tag>, responsive: ['md'] },
-    { title: 'Mes', dataIndex: 'planMonth', responsive: ['md'] }
+    { title: 'Mes', dataIndex: 'planMonth', responsive: ['md'] },
+    { title: '', key: 'actions', width: 50, render: (_, r) => (
+      <Popconfirm title="Segura que quieres eliminar este pago?" onConfirm={() => handleDelete(r.id)}>
+        <Button size="small" icon={<DeleteOutlined />} danger type="text" />
+      </Popconfirm>
+    )}
   ]
 
   return (

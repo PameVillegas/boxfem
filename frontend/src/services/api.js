@@ -39,7 +39,8 @@ export const clientsAPI = {
 export const paymentsAPI = {
   getAll: () => api.get('/payments'),
   getMonthly: (month, year) => api.get(`/payments/monthly?month=${month}&year=${year}`),
-  create: (data) => api.post('/payments', data)
+  create: (data) => api.post('/payments', data),
+  remove: (id) => api.delete(`/payments/${id}`)
 }
 
 export const classesAPI = {
