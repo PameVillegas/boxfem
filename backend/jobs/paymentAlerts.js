@@ -59,6 +59,39 @@ async function checkPendingPayments() {
       }
     }
   }
+
+  if (dayOfMonth === 15) {
+    // Buscar clientas con cuota vencida que no pagaron este mes
+    const { Payment } = require('../models')
+    const monthStart = today.startOf('month').format('YYYY-MM-DD')
+    const allClients = await Client.findAll({ where: { status: 'expired' } })
+
+    for (const client of allClients) {
+      // Verificar si tiene algun pago este mes
+      const paidThisMonth = await Payment.findOne({
+        where: {
+          clientId: client.id,
+          paymentDate: { [Op.gte]: monthStart }
+        }
+      })
+
+      if (!paidThisMonth) {
+        const msg = `🚨 *FemmBox - Cuota Pendiente + Recargo*\n\nHola ${client.name}, tu cuota aún no fue abonada. A partir del día 10, se aplicó un recargo del 10%.\n\nRegularizá tu situación para seguir entrenando.\n\nAlias: FEMMBOX93\n\nGracias!`
+        await Alert.create({
+          clientId: client.id,
+          type: 'surcharge',
+          message: `${client.name} ${client.lastName} - Dia 15: cuota pendiente + recargo 10%`,
+          status: 'pending'
+        })
+        try {
+          await whatsapp.sendMessage(client.phone, msg)
+          console.log(`Aviso dia 15 enviado a ${client.name} ${client.lastName}`)
+        } catch (e) {
+          console.log(`No se pudo notificar a ${client.name}: ${e.message}`)
+        }
+      }
+    }
+  }
 }
 
 async function checkDailyExpirations() {

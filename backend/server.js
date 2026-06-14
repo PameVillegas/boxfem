@@ -49,6 +49,11 @@ cron.schedule('0 8 10 * *', async () => {
   await checkPendingPayments()
 })
 
+cron.schedule('0 8 15 * *', async () => {
+  console.log('Verificando pagos pendientes (día 15)...')
+  await checkPendingPayments()
+})
+
 async function start() {
   try {
     await sequelize.authenticate()
