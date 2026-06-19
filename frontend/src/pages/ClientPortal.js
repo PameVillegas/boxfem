@@ -219,6 +219,20 @@ function ClientPortal() {
             </Col>
           </Row>
 
+          {/* Sorteo mensual */}
+          <motion.div {...stagger(4)}>
+            <Card style={{ ...cardBase, padding: 14, marginBottom: 14, borderColor: paidBeforeTen ? '#52c41a33' : '#d4a01733' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Text style={{ fontSize: 22 }}>🎁</Text>
+                <div>
+                  <Text style={{ color: paidBeforeTen ? '#52c41a' : '#d4a017', fontSize: 13, fontWeight: '600' }}>{paidBeforeTen ? 'Estas participando del Sorteo Mensual!' : 'Sorteo mensual'}</Text>
+                  <br />
+                  <Text style={{ color: '#888', fontSize: 11 }}>{paidBeforeTen ? 'Por pagar en termino! Mucha suerte!' : 'Paga antes del 10 y participa del sorteo'}</Text>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
           {/* Frase del dia */}
           {dailyPhrase && (
             <motion.div {...stagger(4)}>
@@ -284,9 +298,9 @@ function ClientPortal() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Text style={{ fontSize: 24 }}>🎁</Text>
                 <div>
-                  <Text style={{ color: paidBeforeTen ? '#52c41a' : '#d4a017', fontSize: 13, fontWeight: '600' }}>{paidBeforeTen ? 'Estas en el sorteo!' : 'Sorteo mensual'}</Text>
+                  <Text style={{ color: paidBeforeTen ? '#52c41a' : '#d4a017', fontSize: 13, fontWeight: '600' }}>{paidBeforeTen ? 'Participando del Sorteo Mensual!' : 'Sorteo mensual'}</Text>
                   <br />
-                  <Text style={{ color: '#555', fontSize: 11 }}>{paidBeforeTen ? 'Pagaste antes del 10. Suerte!' : 'Paga antes del 10 y participa'}</Text>
+                  <Text style={{ color: '#555', fontSize: 11 }}>{paidBeforeTen ? 'Por pagar en termino!' : 'Paga antes del 10 y participa'}</Text>
                 </div>
               </div>
             </Card>
@@ -342,6 +356,17 @@ function ClientPortal() {
       {activeTab === 'pagos' && (
         <div>
           <Title level={4} style={{ color: '#ff1493', marginBottom: 16 }}>Pagos</Title>
+          {/* Sorteo */}
+          <Card style={{ ...cardBase, padding: 14, marginBottom: 14, borderColor: paidBeforeTen ? '#52c41a33' : '#d4a01733' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Text style={{ fontSize: 22 }}>🎁</Text>
+              <div>
+                <Text style={{ color: paidBeforeTen ? '#52c41a' : '#d4a017', fontSize: 13, fontWeight: '600' }}>{paidBeforeTen ? 'Estas participando del Sorteo Mensual!' : 'Sorteo mensual'}</Text>
+                <br />
+                <Text style={{ color: '#888', fontSize: 11 }}>{paidBeforeTen ? 'Por pagar en termino! Mucha suerte!' : 'Paga antes del 10 y participa del sorteo'}</Text>
+              </div>
+            </div>
+          </Card>
           <Card style={{ ...cardBase, padding: 16, marginBottom: 14, textAlign: 'center' }}>
             <Text style={{ color: '#888', fontSize: 12 }}>Transferencia</Text>
             <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', display: 'block', marginTop: 6 }}>FEMMBOX93</Text>
