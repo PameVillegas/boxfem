@@ -31,6 +31,7 @@ function ClientPortal() {
   const [showEditTurnos, setShowEditTurnos] = useState(false)
   const [activeTab, setActiveTab] = useState('inicio')
   const [dailyPhrase, setDailyPhrase] = useState('')
+  const [showSorteoAlert, setShowSorteoAlert] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('clientToken')
@@ -69,6 +70,13 @@ function ClientPortal() {
     try {
       const [p, pay, c, a] = await Promise.all([portalAPI.getProfile(config), portalAPI.getPayments(config), portalAPI.getClasses(config), portalAPI.getAttendance(config)])
       setProfile(p.data); setPayments(pay.data); setClasses(c.data); setAttendance(a.data)
+      // Mostrar alerta de sorteo si pago antes del 10
+      const today = dayjs()
+      const hasPaidThisMonth = pay.data.some(payment => {
+        const d = dayjs(payment.paymentDate)
+        return d.month() === today.month() && d.year() === today.year() && d.date() <= 10
+      })
+      if (hasPaidThisMonth && today.date() <= 10) setShowSorteoAlert(true)
       // Procesar QR pendiente
       const pendingQR = localStorage.getItem('pendingQR')
       if (pendingQR && p.data.id) {
@@ -151,6 +159,22 @@ function ClientPortal() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a', paddingBottom: 70 }}>
+
+      {/* Alerta fullscreen sorteo */}
+      <AnimatePresence>
+      {showSorteoAlert && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.92)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setShowSorteoAlert(false)}>
+          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring' }} style={{ textAlign: 'center', maxWidth: 320 }}>
+            <Text style={{ fontSize: 60, display: 'block' }}>🎁</Text>
+            <Title level={3} style={{ color: '#52c41a', margin: '16px 0 8px' }}>Estas participando del Sorteo Mensual!</Title>
+            <Text style={{ color: '#aaa', fontSize: 15 }}>Por pagar en termino, ya estas en el sorteo de este mes. Mucha suerte!</Text>
+            <br /><br />
+            <Button type="primary" size="large" onClick={() => setShowSorteoAlert(false)} style={{ borderRadius: 12 }}>Cerrar</Button>
+          </motion.div>
+        </motion.div>
+      )}
+      </AnimatePresence>
+
       <div style={{ padding: '16px 14px 0' }}>
 
       <AnimatePresence mode="wait">

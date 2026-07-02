@@ -54,6 +54,13 @@ cron.schedule('0 8 15 * *', async () => {
   await checkPendingPayments()
 })
 
+// Recordatorio 30 min antes de cada clase
+const { sendPreClassReminders } = require('./jobs/preClassReminder')
+cron.schedule('30 7,8,13,14,18,19 * * 1-5', async () => {
+  console.log('Verificando recordatorios pre-clase...')
+  await sendPreClassReminders()
+})
+
 async function start() {
   try {
     await sequelize.authenticate()
