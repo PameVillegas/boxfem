@@ -3,9 +3,10 @@ const { Class, Client } = require('../models')
 const whatsapp = require('../services/whatsapp')
 
 async function sendPreClassReminders() {
-  const now = dayjs()
-  const currentHour = now.hour()
-  const currentMin = now.minute()
+  const now = dayjs().subtract(3, 'hour').add(3, 'hour') // Ajustar: el server esta en UTC, calculamos hora Argentina
+  const argNow = dayjs().utcOffset(-3)
+  const currentHour = argNow.hour()
+  const currentMin = argNow.minute()
 
   // Calcular que clase empieza en 30 min
   const targetHour = currentMin >= 30 ? currentHour + 1 : currentHour
@@ -13,7 +14,7 @@ async function sendPreClassReminders() {
 
   // Dia de hoy en ingles
   const dayMap = { 0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday' }
-  const todayEng = dayMap[now.day()]
+  const todayEng = dayMap[argNow.day()]
 
   // Buscar clases que empiezan a la hora target hoy
   const classes = await Class.findAll({

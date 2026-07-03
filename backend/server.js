@@ -34,29 +34,29 @@ if (process.env.NODE_ENV === 'production') {
   })
 }
 
-cron.schedule('30 9 * * *', async () => {
+cron.schedule('30 12 * * *', async () => {
   console.log('Revisando vencimientos diarios...')
   await checkDailyExpirations()
 })
 
-cron.schedule('0 8 5 * *', async () => {
+cron.schedule('0 11 5 * *', async () => {
   console.log('Revisando pagos pendientes (día 5)...')
   await checkPendingPayments()
 })
 
-cron.schedule('0 8 10 * *', async () => {
+cron.schedule('0 11 10 * *', async () => {
   console.log('Aplicando recargos (día 10)...')
   await checkPendingPayments()
 })
 
-cron.schedule('0 8 15 * *', async () => {
+cron.schedule('0 11 15 * *', async () => {
   console.log('Verificando pagos pendientes (día 15)...')
   await checkPendingPayments()
 })
 
-// Recordatorio 30 min antes de cada clase
+// Recordatorio 30 min antes de cada clase (horarios en UTC, Argentina es UTC-3)
 const { sendPreClassReminders } = require('./jobs/preClassReminder')
-cron.schedule('30 7,8,13,14,18,19 * * 1-5', async () => {
+cron.schedule('30 10,11,16,17,21,22 * * 1-5', async () => {
   console.log('Verificando recordatorios pre-clase...')
   await sendPreClassReminders()
 })
