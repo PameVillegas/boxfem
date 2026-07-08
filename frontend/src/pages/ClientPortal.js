@@ -32,6 +32,12 @@ function ClientPortal() {
   const [activeTab, setActiveTab] = useState('inicio')
   const [dailyPhrase, setDailyPhrase] = useState('')
   const [showSorteoAlert, setShowSorteoAlert] = useState(false)
+  const [showSplash, setShowSplash] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 2500)
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     const token = localStorage.getItem('clientToken')
@@ -112,6 +118,14 @@ function ClientPortal() {
   if (!isLoggedIn) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#0a0a0a', padding: 16, position: 'relative' }}>
+        {/* Splash screen */}
+        <AnimatePresence>
+        {showSplash && (
+          <motion.div initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#0a0a0a', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <motion.img src="/argentina.png" alt="FemmBox" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} style={{ maxWidth: '85%', maxHeight: '85vh', objectFit: 'contain' }} />
+          </motion.div>
+        )}
+        </AnimatePresence>
         <Button type="link" size="small" style={{ position: 'absolute', top: 12, right: 12, color: '#666', fontSize: 11, border: '1px solid #333', borderRadius: 8, padding: '2px 10px' }} href="/login">Admin</Button>
         <motion.div {...fadeUp} style={{ width: '100%', maxWidth: 380 }}>
           <Card style={{ ...cardGlow, padding: 24 }}>
