@@ -1,20 +1,27 @@
 const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
 const { Class, Client } = require('../models')
 const whatsapp = require('../services/whatsapp')
 
 async function sendPreClassReminders() {
-  const now = dayjs().subtract(3, 'hour').add(3, 'hour') // Ajustar: el server esta en UTC, calculamos hora Argentina
-  const argNow = dayjs().utcOffset(-3)
+  // Hora actual en Argentina
+  const argNow = dayjs().tz('America/Argentina/Buenos_Aires')
   const currentHour = argNow.hour()
   const currentMin = argNow.minute()
 
-  // Calcular que clase empieza en 30 min
-  const targetHour = currentMin >= 30 ? currentHour + 1 : currentHour
+  // La clase que empieza en ~30 min: si son las XX:30, la clase es a las (XX+1):00
+  const targetHour = currentHour + 1
   const targetTime = `${String(targetHour).padStart(2, '0')}:00`
 
-  // Dia de hoy en ingles
+  // Dia de hoy
   const dayMap = { 0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday' }
   const todayEng = dayMap[argNow.day()]
+
+  console.log(`[PreClass] Argentina: ${argNow.format('HH:mm')} (${todayEng}) - buscando clase de las ${targetTime}`)
 
   // Buscar clases que empiezan a la hora target hoy
   const classes = await Class.findAll({
@@ -22,7 +29,10 @@ async function sendPreClassReminders() {
     include: [Client]
   })
 
-  if (classes.length === 0) return
+  if (classes.length === 0) {
+    console.log(`[PreClass] No hay clases a las ${targetTime} hoy`)
+    return
+  }
 
   const msg = `🥊 *FemmBox - Recordatorio*\n\nEn un rato empieza el entrenamiento.\n\nQuizas hoy estes cansada, con suenio o sin motivacion. Pero la disciplina vale mas que las ganas.\n\nNo faltes por una excusa. Anda por vos! 💪`
 
@@ -33,9 +43,9 @@ async function sendPreClassReminders() {
       if (client.status !== 'active' || !client.phone) continue
       try {
         await whatsapp.sendMessage(client.phone, msg)
-        console.log(`Recordatorio enviado a ${client.name} ${client.lastName} para ${cls.startTime}`)
+        console.log(`[PreClass] Enviado a ${client.name} ${client.lastName} (clase ${cls.startTime})`)
       } catch (e) {
-        console.log(`No se pudo enviar a ${client.name}: ${e.message}`)
+        console.log(`[PreClass] Error ${client.name}: ${e.message}`)
       }
     }
   }
