@@ -108,7 +108,7 @@ function Clients() {
       width: 120,
       render: (_, r) => (
         <Space size="small">
-          <Button size="small" icon={<EditOutlined />} onClick={() => { setSelectedClient(r); form.setFieldsValue(r); setModalVisible(true) }} />
+          <Button size="small" icon={<EditOutlined />} onClick={() => { setSelectedClient(r); form.setFieldsValue({ ...r, expirationDate: r.expirationDate ? dayjs(r.expirationDate) : null }); setModalVisible(true) }} />
           <Button size="small" icon={<DollarOutlined />} onClick={() => { setSelectedClient(r); setPaymentModal(true) }} />
           <Popconfirm title="Eliminar?" onConfirm={async () => { await clientsAPI.remove(r.id); loadClients() }}>
             <Button size="small" icon={<DeleteOutlined />} danger />
