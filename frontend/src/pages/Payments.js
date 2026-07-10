@@ -152,10 +152,10 @@ function Payments() {
               showSearch
               placeholder="Buscar alumna..."
               optionFilterProp="children"
-              filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
+              filterOption={(input, option) => (option.children || '').toString().toLowerCase().includes(input.toLowerCase())}
             >
               {clients.map(c => (
-                <Select.Option key={c.id} value={c.id}>{c.name} {c.lastName}</Select.Option>
+                <Select.Option key={c.id} value={c.id}>{(c.name || '')} {(c.lastName || '')}</Select.Option>
               ))}
             </Select>
           </Form.Item>
