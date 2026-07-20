@@ -8,6 +8,15 @@ const { Class, Client } = require('../models')
 const whatsapp = require('../services/whatsapp')
 
 async function sendPreClassReminders() {
+  // Verificar si los mensajes estan pausados
+  try {
+    const whatsappRoutes = require('../routes/whatsapp')
+    if (whatsappRoutes.isPaused && whatsappRoutes.isPaused()) {
+      console.log('[PreClass] Mensajes pausados (vacaciones)')
+      return
+    }
+  } catch (e) {}
+
   // Hora actual en Argentina
   const argNow = dayjs().tz('America/Argentina/Buenos_Aires')
   const currentHour = argNow.hour()

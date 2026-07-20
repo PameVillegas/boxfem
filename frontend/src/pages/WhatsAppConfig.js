@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Typography, Spin, Tag, Image, Button, Input, Space, message, Alert, Divider } from 'antd'
-import { ReloadOutlined, LogoutOutlined, WhatsAppOutlined, LinkOutlined, QrcodeOutlined } from '@ant-design/icons'
+import { Card, Typography, Spin, Tag, Image, Button, Input, Space, message, Alert, Divider, DatePicker, Switch } from 'antd'
+import { ReloadOutlined, LogoutOutlined, WhatsAppOutlined, LinkOutlined, QrcodeOutlined, PauseCircleOutlined } from '@ant-design/icons'
 import { whatsappAPI } from '../services/api'
+import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
 
@@ -12,12 +13,19 @@ function WhatsAppConfig() {
   const [sending, setSending] = useState(false)
   const [linkPhone, setLinkPhone] = useState('')
   const [requesting, setRequesting] = useState(false)
+  const [paused, setPaused] = useState(false)
+  const [pauseUntil, setPauseUntil] = useState(null)
 
   useEffect(() => {
     const interval = setInterval(loadStatus, 2500)
     loadStatus()
+    loadPauseStatus()
     return () => clearInterval(interval)
   }, [])
+
+  const loadPauseStatus = async () => {
+    try { const res = await whatsappAPI.getPauseStatus(); setPaused(res.data.paused); setPauseUntil(res.data.pauseUntil) } catch(e) {}
+  }
 
   const loadStatus = async () => {
     try {
@@ -241,6 +249,31 @@ function WhatsAppConfig() {
         <Button onClick={triggerCheck} disabled={!status?.isReady}>
           Ejecutar Verificación Ahora
         </Button>
+      </Card>
+
+      {/* Vacaciones / Pausar mensajes */}
+      <Card title={<span><PauseCircleOutlined /> Vacaciones / Pausar Mensajes</span>} style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <Switch checked={paused} onChange={async (checked) => {
+            if (checked) {
+              if (pauseUntil) { await whatsappAPI.pause(pauseUntil); setPaused(true); message.success('Mensajes pausados') }
+              else { message.warning('Selecciona hasta cuando pausar') }
+            } else {
+              await whatsappAPI.resume(); setPaused(false); setPauseUntil(null); message.success('Mensajes reanudados')
+            }
+          }} />
+          <Text>{paused ? 'Mensajes PAUSADOS' : 'Mensajes activos'}</Text>
+          {paused && <Tag color="orange">Pausado{pauseUntil ? ` hasta ${dayjs(pauseUntil).format('DD/MM/YYYY')}` : ''}</Tag>}
+        </div>
+        <Space>
+          <DatePicker placeholder="Pausar hasta..." onChange={(d) => setPauseUntil(d ? d.format('YYYY-MM-DD') : null)} />
+          <Button type="primary" danger onClick={async () => { if (!pauseUntil) return message.warning('Selecciona fecha'); await whatsappAPI.pause(pauseUntil); setPaused(true); message.success('Pausado hasta ' + dayjs(pauseUntil).format('DD/MM')) }}>
+            Pausar
+          </Button>
+          {paused && <Button onClick={async () => { await whatsappAPI.resume(); setPaused(false); setPauseUntil(null); message.success('Reanudado') }}>Reanudar</Button>}
+        </Space>
+        <br />
+        <Text style={{ fontSize: 12, color: '#888', marginTop: 8, display: 'block' }}>Cuando esta pausado, no se envian recordatorios pre-clase ni alertas de pago.</Text>
       </Card>
 
       {/* Info */}

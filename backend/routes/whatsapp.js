@@ -70,4 +70,39 @@ router.post('/trigger-check', async (req, res) => {
   }
 })
 
+// Pausar/reanudar mensajes automaticos (vacaciones)
+let messagesPaused = false
+let pauseUntil = null
+
+router.get('/pause-status', (req, res) => {
+  res.json({ paused: messagesPaused, pauseUntil })
+})
+
+router.post('/pause', (req, res) => {
+  const { until } = req.body
+  messagesPaused = true
+  pauseUntil = until || null
+  res.json({ success: true, paused: true, pauseUntil })
+})
+
+router.post('/resume', (req, res) => {
+  messagesPaused = false
+  pauseUntil = null
+  res.json({ success: true, paused: false })
+})
+
+// Exportar estado de pausa para los jobs
+router.isPaused = () => {
+  if (!messagesPaused) return false
+  if (pauseUntil) {
+    const dayjs = require('dayjs')
+    if (dayjs().isAfter(dayjs(pauseUntil))) {
+      messagesPaused = false
+      pauseUntil = null
+      return false
+    }
+  }
+  return true
+}
+
 module.exports = router

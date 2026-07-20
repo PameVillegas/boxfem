@@ -85,7 +85,10 @@ export const whatsappAPI = {
   restart: () => api.post('/whatsapp/restart'),
   logout: () => api.post('/whatsapp/logout'),
   connectPhone: (phoneNumber) => api.post('/whatsapp/connect-phone', { phoneNumber }),
-  startQR: () => api.post('/whatsapp/start-qr')
+  startQR: () => api.post('/whatsapp/start-qr'),
+  getPauseStatus: () => api.get('/whatsapp/pause-status'),
+  pause: (until) => api.post('/whatsapp/pause', { until }),
+  resume: () => api.post('/whatsapp/resume')
 }
 
 export const portalAPI = {

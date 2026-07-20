@@ -5,6 +5,15 @@ const { Client, Alert } = require('../models')
 const whatsapp = require('../services/whatsapp')
 
 async function checkPendingPayments() {
+  // Verificar si los mensajes estan pausados
+  try {
+    const whatsappRoutes = require('../routes/whatsapp')
+    if (whatsappRoutes.isPaused && whatsappRoutes.isPaused()) {
+      console.log('[Pagos] Mensajes pausados (vacaciones)')
+      return
+    }
+  } catch (e) {}
+
   const today = dayjs()
   const dayOfMonth = today.date()
 
