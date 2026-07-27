@@ -122,7 +122,7 @@ function ClientPortal() {
         <AnimatePresence>
         {showSplash && (
           <motion.div initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#0a0a0a', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <motion.img src="/argentina.png" alt="FemmBox" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} style={{ maxWidth: '85%', maxHeight: '85vh', objectFit: 'contain' }} />
+            <motion.img src="/screenfemm.png" alt="FemmBox" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} style={{ maxWidth: '85%', maxHeight: '85vh', objectFit: 'contain' }} />
           </motion.div>
         )}
         </AnimatePresence>
