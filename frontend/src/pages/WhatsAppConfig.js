@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Typography, Spin, Tag, Image, Button, Input, Space, message, Alert, Divider, DatePicker, Switch } from 'antd'
+import { Card, Typography, Spin, Tag, Image, Button, Input, Space, message, Alert, Divider, DatePicker } from 'antd'
 import { ReloadOutlined, LogoutOutlined, WhatsAppOutlined, LinkOutlined, QrcodeOutlined, PauseCircleOutlined } from '@ant-design/icons'
 import { whatsappAPI } from '../services/api'
 import dayjs from 'dayjs'
@@ -253,27 +253,48 @@ function WhatsAppConfig() {
 
       {/* Vacaciones / Pausar mensajes */}
       <Card title={<span><PauseCircleOutlined /> Vacaciones / Pausar Mensajes</span>} style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-          <Switch checked={paused} onChange={async (checked) => {
-            if (checked) {
-              if (pauseUntil) { await whatsappAPI.pause(pauseUntil); setPaused(true); message.success('Mensajes pausados') }
-              else { message.warning('Selecciona hasta cuando pausar') }
-            } else {
-              await whatsappAPI.resume(); setPaused(false); setPauseUntil(null); message.success('Mensajes reanudados')
-            }
-          }} />
-          <Text>{paused ? 'Mensajes PAUSADOS' : 'Mensajes activos'}</Text>
-          {paused && <Tag color="orange">Pausado{pauseUntil ? ` hasta ${dayjs(pauseUntil).format('DD/MM/YYYY')}` : ''}</Tag>}
-        </div>
-        <Space>
-          <DatePicker placeholder="Pausar hasta..." onChange={(d) => setPauseUntil(d ? d.format('YYYY-MM-DD') : null)} />
-          <Button type="primary" danger onClick={async () => { if (!pauseUntil) return message.warning('Selecciona fecha'); await whatsappAPI.pause(pauseUntil); setPaused(true); message.success('Pausado hasta ' + dayjs(pauseUntil).format('DD/MM')) }}>
-            Pausar
-          </Button>
-          {paused && <Button onClick={async () => { await whatsappAPI.resume(); setPaused(false); setPauseUntil(null); message.success('Reanudado') }}>Reanudar</Button>}
-        </Space>
-        <br />
-        <Text style={{ fontSize: 12, color: '#888', marginTop: 8, display: 'block' }}>Cuando esta pausado, no se envian recordatorios pre-clase ni alertas de pago.</Text>
+        {paused ? (
+          <div>
+            <Tag color="orange" style={{ fontSize: 14, padding: '6px 16px', marginBottom: 12 }}>
+              MENSAJES PAUSADOS {pauseUntil ? `hasta ${dayjs(pauseUntil).format('DD/MM/YYYY')}` : ''}
+            </Tag>
+            <br />
+            <Button type="primary" size="large" style={{ marginTop: 8 }} onClick={async () => {
+              try {
+                await whatsappAPI.resume()
+                setPaused(false)
+                setPauseUntil(null)
+                message.success('Mensajes reactivados!')
+              } catch(e) { message.error('Error') }
+            }}>
+              Activar mensajes
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <Tag color="green" style={{ fontSize: 14, padding: '6px 16px', marginBottom: 12 }}>
+              Mensajes ACTIVOS
+            </Tag>
+            <br />
+            <Text style={{ display: 'block', marginBottom: 8, marginTop: 8 }}>Pausar hasta:</Text>
+            <Space>
+              <DatePicker placeholder="Seleccionar fecha" onChange={(d) => setPauseUntil(d ? d.format('YYYY-MM-DD') : null)} />
+              <Button danger onClick={async () => {
+                if (!pauseUntil) return message.warning('Selecciona una fecha')
+                try {
+                  await whatsappAPI.pause(pauseUntil)
+                  setPaused(true)
+                  message.success('Mensajes pausados hasta ' + dayjs(pauseUntil).format('DD/MM'))
+                } catch(e) { message.error('Error') }
+              }}>
+                Pausar mensajes
+              </Button>
+            </Space>
+          </div>
+        )}
+        <Text style={{ fontSize: 12, color: '#888', marginTop: 12, display: 'block' }}>
+          Cuando esta pausado, no se envian recordatorios ni alertas automaticas de WhatsApp.
+        </Text>
       </Card>
 
       {/* Info */}
