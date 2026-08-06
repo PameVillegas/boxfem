@@ -163,8 +163,8 @@ function Attendance() {
           )}
           <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #222' }}>
             <Text style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 6 }}><PlusOutlined /> Agregar extra:</Text>
-            <Select showSearch placeholder="Buscar alumna..." value={extraClient} onChange={(val) => { setExtraClient(val); if (val && !checkedIds.includes(val)) setCheckedIds([...checkedIds, val]) }} style={{ width: '100%' }} allowClear filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
-              {availableExtras.map(c => <Select.Option key={c.id} value={c.id}>{c.name} {c.lastName}</Select.Option>)}
+            <Select showSearch placeholder="Buscar alumna..." value={extraClient} onChange={(val) => { setExtraClient(val); if (val && !checkedIds.includes(val)) setCheckedIds([...checkedIds, val]) }} style={{ width: '100%' }} allowClear filterOption={(input, option) => (option.children || '''').toString().toLowerCase().includes(input.toLowerCase())}>
+              {availableExtras.map(c => <Select.Option key={c.id} value={c.id}>{(c.name||'')} {(c.lastName||'')}</Select.Option>)}
             </Select>
           </div>
         </Card>
@@ -200,8 +200,8 @@ function Attendance() {
         <Text strong style={{ fontSize: 13, display: 'block', marginBottom: 10 }}>Agregar asistencia manual</Text>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <DatePicker value={manualDate} onChange={(d) => d && setManualDate(d)} style={{ width: '100%' }} placeholder="Fecha" />
-          <Select showSearch placeholder="Alumna..." value={manualClient} onChange={setManualClient} style={{ width: '100%' }} allowClear filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
-            {clients.map(c => <Select.Option key={c.id} value={c.id}>{c.name} {c.lastName}</Select.Option>)}
+          <Select showSearch placeholder="Alumna..." value={manualClient} onChange={setManualClient} style={{ width: '100%' }} allowClear filterOption={(input, option) => (option.children || '''').toString().toLowerCase().includes(input.toLowerCase())}>
+            {clients.map(c => <Select.Option key={c.id} value={c.id}>{(c.name||'')} {(c.lastName||'')}</Select.Option>)}
           </Select>
           <Select placeholder="Clase..." value={manualClass} onChange={setManualClass} style={{ width: '100%' }} allowClear>
             {classes.map(c => <Select.Option key={c.id} value={c.id}>{dayNames[c.dayOfWeek] || ''} {c.name} {c.startTime}-{c.endTime}</Select.Option>)}

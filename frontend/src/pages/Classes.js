@@ -188,10 +188,10 @@ function Classes() {
               showSearch
               placeholder="Buscar alumna..."
               optionFilterProp="children"
-              filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
+              filterOption={(input, option) => (option.children || '').toString().toLowerCase().includes(input.toLowerCase())}
             >
               {availableClients.map(c => (
-                <Select.Option key={c.id} value={c.id}>{c.name} {c.lastName}</Select.Option>
+                <Select.Option key={c.id} value={c.id}>{(c.name||'')} {(c.lastName||'')}</Select.Option>
               ))}
             </Select>
           </Form.Item>
@@ -208,7 +208,7 @@ function Classes() {
                     <Button size="small" icon={<UserDeleteOutlined />} danger type="text" />
                   </Popconfirm>
                 ]}>
-                  {c.name} {c.lastName}
+                  {(c.name||'')} {(c.lastName||'')}
                 </List.Item>
               )}
             />
