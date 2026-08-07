@@ -3,8 +3,16 @@ const router = express.Router()
 const { Attendance, Client, Class } = require('../models')
 const { Op } = require('sequelize')
 const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+dayjs.extend(utc)
+dayjs.extend(timezone)
 const QRCode = require('qrcode')
 const jwt = require('jsonwebtoken')
+
+// Fecha/hora SIEMPRE en horario de Argentina (el server puede estar en UTC)
+const argNow = () => dayjs().tz('America/Argentina/Buenos_Aires')
+const argToday = () => argNow().format('YYYY-MM-DD')
 
 router.get('/', async (req, res) => {
   try {
@@ -29,10 +37,20 @@ router.post('/checkin', async (req, res) => {
       return res.status(400).json({ error: 'Acceso denegado: cuota vencida' })
     }
 
-    const attendanceDate = date || dayjs().format('YYYY-MM-DD')
-    // Evitar duplicados
-    const existing = await Attendance.findOne({ where: { clientId, classId, date: attendanceDate } })
-    if (existing) return res.json({ message: 'Ya registrada', attendance: existing })
+    const attendanceDate = date || argToday()
+    // Evitar duplicados: mismo client+class+date, o el QR fijo que quedo sin turno (classId null)
+    const existing = await Attendance.findOne({
+      where: {
+        clientId,
+        date: attendanceDate,
+        [Op.or]: [{ classId }, { classId: null }]
+      }
+    })
+    if (existing) {
+      // Si venia del QR fijo sin turno, completamos el horario registrado por la profe
+      if (!existing.classId && classId) await existing.update({ classId })
+      return res.json({ message: 'Ya registrada', attendance: existing })
+    }
 
     const attendance = await Attendance.create({ clientId, classId, method: method || 'manual', date: attendanceDate })
     res.json(attendance)
@@ -49,7 +67,7 @@ router.get('/qr/:classId', async (req, res) => {
 
     // Token temporal que expira en 2 horas
     const token = jwt.sign(
-      { classId: classItem.id, date: dayjs().format('YYYY-MM-DD'), type: 'attendance_qr' },
+      { classId: classItem.id, date: argToday(), type: 'attendance_qr' },
       process.env.JWT_SECRET,
       { expiresIn: '2h' }
     )
@@ -109,27 +127,42 @@ router.post('/qr-auto-checkin', async (req, res) => {
     const client = await Client.findByPk(clientId)
     if (!client || client.status !== 'active') return res.status(400).json({ error: 'Cuota vencida' })
 
-    const today = dayjs().format('YYYY-MM-DD')
-    const hour = dayjs().hour()
-    const dayName = dayjs().format('dddd').toLowerCase()
+    const now = argNow()
+    const today = now.format('YYYY-MM-DD')
+    const currentMinutes = now.hour() * 60 + now.minute()
+    const dayName = now.format('dddd').toLowerCase()
     const dayMap = { monday: 'monday', tuesday: 'tuesday', wednesday: 'wednesday', thursday: 'thursday', friday: 'friday', lunes: 'monday', martes: 'tuesday', miercoles: 'wednesday', jueves: 'thursday', viernes: 'friday' }
     const todayEng = dayMap[dayName] || ''
 
-    // Buscar la clase mas cercana a la hora actual
+    // Buscar la clase: el turno ya iniciado mas reciente (14:00-14:59 -> clase 14:00, 15:01 -> clase 15:00)
     const todayClasses = await Class.findAll({ where: { dayOfWeek: todayEng, active: true } })
-    let bestClass = null
-    let bestDiff = 999
-    todayClasses.forEach(c => {
-      const startHour = parseInt(c.startTime.split(':')[0])
-      const diff = Math.abs(hour - startHour)
-      if (diff < bestDiff) { bestDiff = diff; bestClass = c }
+    const classTimes = todayClasses.map(c => {
+      const [sh, sm] = (c.startTime || '0:0').split(':').map(Number)
+      return { cls: c, minutes: sh * 60 + sm }
     })
+    let bestClass = null
+    const started = classTimes.filter(t => t.minutes <= currentMinutes)
+    if (started.length > 0) {
+      // El turno que arranco mas recientemente
+      bestClass = started.reduce((a, b) => (b.minutes > a.minutes ? b : a)).cls
+    } else {
+      // Todavia no arranco ningun turno: el proximo mas cercano
+      let bestDiff = 999
+      classTimes.forEach(t => {
+        const diff = Math.abs(currentMinutes - t.minutes)
+        if (diff < bestDiff) { bestDiff = diff; bestClass = t.cls }
+      })
+    }
 
     const classId = bestClass ? bestClass.id : null
 
-    // Evitar duplicados
-    const existing = await Attendance.findOne({ where: { clientId, date: today, ...(classId ? { classId } : {}) } })
-    if (existing) return res.json({ message: 'Ya registrada hoy', attendance: existing })
+    // Evitar duplicados: una sola asistencia por client por dia
+    const existing = await Attendance.findOne({ where: { clientId, date: today } })
+    if (existing) {
+      // Si el QR fijo no habia podido detectar el turno, lo completamos ahora
+      if (!existing.classId && classId) await existing.update({ classId })
+      return res.json({ message: 'Ya registrada hoy', attendance: existing })
+    }
 
     const attendance = await Attendance.create({ clientId, classId, method: 'qr', date: today })
     res.json({ success: true, message: 'Asistencia registrada!', className: bestClass?.name || 'Clase', attendance })

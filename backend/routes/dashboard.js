@@ -3,6 +3,11 @@ const router = express.Router()
 const { Client, Payment, Attendance, Class } = require('../models')
 const { Op, fn, col, literal } = require('sequelize')
 const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+const argToday = () => dayjs().tz('America/Argentina/Buenos_Aires')
 
 router.get('/stats', async (req, res) => {
   try {
@@ -10,8 +15,9 @@ router.get('/stats', async (req, res) => {
     const activeClients = await Client.count({ where: { status: 'active' } })
     const expiredClients = await Client.count({ where: { status: 'expired' } })
 
-    const monthStart = dayjs().startOf('month').format('YYYY-MM-DD')
-    const monthEnd = dayjs().endOf('month').format('YYYY-MM-DD')
+    const now = argToday()
+    const monthStart = now.startOf('month').format('YYYY-MM-DD')
+    const monthEnd = now.endOf('month').format('YYYY-MM-DD')
 
     const monthlyPayments = await Payment.findAll({
       where: { paymentDate: { [Op.between]: [monthStart, monthEnd] } },
@@ -19,7 +25,7 @@ router.get('/stats', async (req, res) => {
     })
 
     const todayAttendance = await Attendance.count({
-      where: { date: dayjs().format('YYYY-MM-DD') }
+      where: { date: now.format('YYYY-MM-DD') }
     })
 
     let popularClasses = []
