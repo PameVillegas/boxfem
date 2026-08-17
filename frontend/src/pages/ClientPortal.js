@@ -487,6 +487,17 @@ function ClientPortal() {
 
       </div>
 
+      {/* ===== FOOTER ===== */}
+      <div style={{ textAlign: 'center', padding: '20px 16px 70px', background: '#0a0a0a' }}>
+        <Text style={{ fontSize: 12, color: '#555' }}>Desarrollado por{' '}
+          <a href="https://www.instagram.com/impulsoweb.pv?igsh=NTNjYXM4ZWdoY3B3" target="_blank" rel="noopener noreferrer" style={{ color: '#ff1493', textDecoration: 'none' }}>Impulso Web PV</a>
+        </Text>
+        <br />
+        <Text style={{ fontSize: 10, color: '#333' }}>© 2026{' '}
+          <a href="https://www.instagram.com/impulsoweb.pv?igsh=NTNjYXM4ZWdoY3B3" target="_blank" rel="noopener noreferrer" style={{ color: '#444', textDecoration: 'none' }}>Impulso Web PV</a>
+        </Text>
+      </div>
+
       {/* ===== BOTTOM NAV ===== */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#0a0a0a', borderTop: '1px solid #1a1a1a', padding: '8px 0 12px', display: 'flex', justifyContent: 'space-around', zIndex: 100 }}>
         {tabs.map(t => (
