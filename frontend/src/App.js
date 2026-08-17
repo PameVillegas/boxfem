@@ -30,7 +30,7 @@ function AppContent() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       {user && <Navbar />}
-      <Content style={{ padding: '12px', marginTop: user ? 52 : 0, background: '#0d0d0d', minHeight: 'calc(100vh - 100px)', overflow: 'hidden' }}>
+      <Content style={{ padding: '24px 28px', marginTop: user ? 56 : 0, background: '#111113', minHeight: 'calc(100vh - 100px)', overflow: 'hidden' }}>
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
@@ -42,7 +42,7 @@ function AppContent() {
           <Route path="/" element={<Navigate to="/portal" replace />} />
         </Routes>
       </Content>
-      <Footer style={{ textAlign: 'center', padding: '12px', background: '#0d0d0d', color: '#555' }}>
+      <Footer style={{ textAlign: 'center', padding: '10px', background: '#111113', color: '#444', fontSize: 12 }}>
         FEMMBOX ©2026
       </Footer>
     </Layout>
@@ -56,12 +56,25 @@ function App() {
       theme={{
         token: {
           colorPrimary: '#ff1493',
-          colorBgBase: '#1a1a1a',
-          colorTextBase: '#ffffff',
-          colorBgContainer: '#2a2a2a',
-          colorBorder: '#444',
-          colorBgElevated: '#333',
-          borderRadius: 8
+          colorBgBase: '#111113',
+          colorTextBase: '#f0f0f0',
+          colorBgContainer: '#1e1e22',
+          colorBorder: '#2a2a2e',
+          colorBgElevated: '#282830',
+          borderRadius: 14,
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+        },
+        components: {
+          Card: {
+            colorBgContainer: '#1e1e22',
+            borderRadiusLG: 16,
+            paddingLG: 20
+          },
+          Menu: {
+            colorItemBgSelected: 'rgba(255,20,147,0.15)',
+            colorItemTextSelected: '#ff1493',
+            borderRadiusItem: 8
+          }
         },
         algorithm: theme.darkAlgorithm
       }}
