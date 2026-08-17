@@ -43,7 +43,7 @@ async function sendPreClassReminders() {
     return
   }
 
-  const msg = `🥊 *FemmBox - Recordatorio*\n\nEn un rato empieza el entrenamiento.\n\nQuizas hoy estes cansada, con suenio o sin motivacion. Pero la disciplina vale mas que las ganas.\n\nNo faltes por una excusa. Anda por vos! 💪`
+  const msg = `🥊 *FemmBox - Recordatorio*\n¡Se viene el entrenamiento! 🔥\n\nPuede que hoy estés cansada, pero cada vez que elegís venir, estás un paso más cerca de tu objetivo.\n\n*No faltes. Tu versión de mañana te lo va a agradecer.* 💪🥊`
 
   for (const cls of classes) {
     if (!cls.Clients || cls.Clients.length === 0) continue
