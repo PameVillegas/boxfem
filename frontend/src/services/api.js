@@ -107,4 +107,9 @@ export const weightRecordsAPI = {
   remove: (id, config) => api.delete(`/weight-records/${id}`, config)
 }
 
+export const settingsAPI = {
+  getAll: () => api.get('/settings'),
+  update: (key, value) => api.put(`/settings/${key}`, { value })
+}
+
 export default api

@@ -9,7 +9,8 @@ import {
   CheckCircleOutlined,
   WhatsAppOutlined,
   LogoutOutlined,
-  MenuOutlined
+  MenuOutlined,
+  TagsOutlined
 } from '@ant-design/icons'
 import { useAuth } from '../context/AuthContext'
 
@@ -21,7 +22,8 @@ const menuItems = [
   { key: '/payments', icon: <DollarOutlined />, label: 'Pagos' },
   { key: '/classes', icon: <CalendarOutlined />, label: 'Clases' },
   { key: '/attendance', icon: <CheckCircleOutlined />, label: 'Asistencia' },
-  { key: '/whatsapp', icon: <WhatsAppOutlined />, label: 'WhatsApp' }
+  { key: '/whatsapp', icon: <WhatsAppOutlined />, label: 'WhatsApp' },
+  { key: '/prices', icon: <TagsOutlined />, label: 'Precios' }
 ]
 
 function Navbar() {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Table, Typography, DatePicker, Statistic, Row, Col, Card, Tag, Button, Modal, Form, Input, Select, message, Popconfirm } from 'antd'
 import { DollarOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
-import { paymentsAPI, clientsAPI } from '../services/api'
+import { paymentsAPI, clientsAPI, settingsAPI } from '../services/api'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -14,9 +14,23 @@ function Payments() {
   const [year, setYear] = useState(dayjs().year())
   const [modalVisible, setModalVisible] = useState(false)
   const [filter, setFilter] = useState('all')
+  const [prices, setPrices] = useState({ price_2x: 25000, price_3x: 30000, price_completa: 35000 })
   const [form] = Form.useForm()
 
-  useEffect(() => { loadPayments(); loadClients() }, [month, year])
+  useEffect(() => { loadPayments(); loadClients(); loadPrices() }, [month, year])
+
+  const loadPrices = async () => {
+    try {
+      const res = await settingsAPI.getAll()
+      const map = {}
+      res.data.forEach(s => { map[s.key] = Number(s.value) })
+      setPrices({
+        price_2x: map.price_2x || 25000,
+        price_3x: map.price_3x || 30000,
+        price_completa: map.price_completa || 35000
+      })
+    } catch (e) {}
+  }
 
   const loadPayments = async () => {
     try {
@@ -161,9 +175,9 @@ function Payments() {
           </Form.Item>
           <Form.Item name="amount" label="Monto ($)" rules={[{ required: true, message: 'Selecciona el monto' }]}>
             <Select placeholder="Seleccionar monto">
-              <Select.Option value={25000}>$25.000 - 2 veces por semana</Select.Option>
-              <Select.Option value={30000}>$30.000 - 3 veces por semana</Select.Option>
-              <Select.Option value={35000}>$35.000 - Semana completa</Select.Option>
+              <Select.Option value={prices.price_2x}>${prices.price_2x.toLocaleString('es-AR')} - 2 veces por semana</Select.Option>
+              <Select.Option value={prices.price_3x}>${prices.price_3x.toLocaleString('es-AR')} - 3 veces por semana</Select.Option>
+              <Select.Option value={prices.price_completa}>${prices.price_completa.toLocaleString('es-AR')} - Semana completa</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item name="paymentMethod" label="Método de Pago" initialValue="cash">

@@ -24,6 +24,7 @@ app.use('/api/whatsapp', require('./routes/whatsapp'))
 app.use('/api/portal', require('./routes/clientPortal'))
 app.use('/api/phrases', require('./routes/phrases'))
 app.use('/api/weight-records', require('./routes/weightRecords'))
+app.use('/api/settings', require('./routes/settings'))
 
 // En producción, servir el frontend estático
 if (process.env.NODE_ENV === 'production') {
@@ -67,6 +68,19 @@ async function start() {
     await sequelize.authenticate()
     console.log('PostgreSQL conectado')
     await sequelize.sync()
+
+    const { Setting } = require('./models')
+    const defaults = {
+      price_2x: '25000',
+      price_3x: '30000',
+      price_completa: '35000'
+    }
+    for (const [key, value] of Object.entries(defaults)) {
+      const existing = await Setting.findOne({ where: { key } })
+      if (!existing) await Setting.create({ key, value })
+    }
+    console.log('Configuracion por defecto verificada')
+
     console.log('Tablas sincronizadas')
     app.listen(process.env.PORT, '0.0.0.0', () => {
       console.log(`Servidor corriendo en puerto ${process.env.PORT}`)

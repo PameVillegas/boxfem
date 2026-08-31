@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, Typography, Input, Button, message, Tag, List, Space, Spin, Empty, Row, Col, Alert, Modal } from 'antd'
 import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined, EnvironmentOutlined, InstagramOutlined, HomeOutlined, TrophyOutlined, DeleteOutlined, PlusOutlined, LineChartOutlined } from '@ant-design/icons'
-import { portalAPI, phrasesAPI, attendanceAPI, weightRecordsAPI } from '../services/api'
+import { portalAPI, phrasesAPI, attendanceAPI, weightRecordsAPI, settingsAPI } from '../services/api'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import dayjs from 'dayjs'
@@ -38,6 +38,7 @@ function ClientPortal() {
   const [showWeightModal, setShowWeightModal] = useState(false)
   const [newWeight, setNewWeight] = useState('')
   const [newWeightDate, setNewWeightDate] = useState(dayjs().format('YYYY-MM-DD'))
+  const [prices, setPrices] = useState({ price_2x: 25000, price_3x: 30000, price_completa: 35000 })
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2500)
@@ -48,6 +49,7 @@ function ClientPortal() {
     const token = localStorage.getItem('clientToken')
     if (token) { setIsLoggedIn(true); loadData(token) }
     loadPhrase()
+    loadPrices()
     // Detectar QR de asistencia en la URL
     const params = new URLSearchParams(window.location.search)
     const qrToken = params.get('qr')
@@ -63,6 +65,19 @@ function ClientPortal() {
   }, [])
 
   const loadPhrase = async () => { try { const r = await phrasesAPI.getToday(); setDailyPhrase(r.data.phrase || '') } catch(e) {} }
+
+  const loadPrices = async () => {
+    try {
+      const res = await settingsAPI.getAll()
+      const map = {}
+      res.data.forEach(s => { map[s.key] = Number(s.value) })
+      setPrices({
+        price_2x: map.price_2x || 25000,
+        price_3x: map.price_3x || 30000,
+        price_completa: map.price_completa || 35000
+      })
+    } catch (e) {}
+  }
 
   const handleLogin = async () => {
     if (!nameInput || !lastName || !code) return message.warning('Completa todos los campos')
@@ -179,7 +194,7 @@ function ClientPortal() {
   // Data
   const enrolledClasses = classes.filter(c => c.isEnrolled)
   const enrolledDays = new Set(enrolledClasses.map(c => c.dayOfWeek)).size
-  const getPlan = (d) => { if (d > 3) return { l: 'Completa', p: 35000 }; if (d === 3) return { l: '3x sem', p: 30000 }; if (d === 2) return { l: '2x sem', p: 25000 }; return { l: '-', p: 0 } }
+  const getPlan = (d) => { if (d > 3) return { l: 'Completa', p: prices.price_completa }; if (d === 3) return { l: '3x sem', p: prices.price_3x }; if (d === 2) return { l: '2x sem', p: prices.price_2x }; return { l: '-', p: 0 } }
   const plan = getPlan(enrolledDays)
   const todayEng = dayMap[todayDayName] || ''
   const hasClassToday = enrolledClasses.some(c => c.dayOfWeek === todayEng)
