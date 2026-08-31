@@ -4,4 +4,5 @@ frontend/node_modules/
 backend/wa_session/
 backend/.env
 frontend/.env
+backend/.env.neon.example
 backend/.wwebjs_cache/
