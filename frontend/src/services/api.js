@@ -101,4 +101,10 @@ export const portalAPI = {
   unenroll: (classId, config) => api.post(`/portal/classes/${classId}/unenroll`, {}, config)
 }
 
+export const weightRecordsAPI = {
+  getAll: (config) => api.get('/weight-records', config),
+  create: (data, config) => api.post('/weight-records', data, config),
+  remove: (id, config) => api.delete(`/weight-records/${id}`, config)
+}
+
 export default api

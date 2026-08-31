@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Typography, Input, Button, message, Tag, List, Space, Spin, Empty, Row, Col, Alert } from 'antd'
-import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined, EnvironmentOutlined, InstagramOutlined, HomeOutlined, TrophyOutlined } from '@ant-design/icons'
-import { portalAPI, phrasesAPI, attendanceAPI } from '../services/api'
+import { Card, Typography, Input, Button, message, Tag, List, Space, Spin, Empty, Row, Col, Alert, Modal } from 'antd'
+import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined, EnvironmentOutlined, InstagramOutlined, HomeOutlined, TrophyOutlined, DeleteOutlined, PlusOutlined, LineChartOutlined } from '@ant-design/icons'
+import { portalAPI, phrasesAPI, attendanceAPI, weightRecordsAPI } from '../services/api'
 import { motion, AnimatePresence } from 'framer-motion'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 dayjs.locale('es')
@@ -33,6 +34,10 @@ function ClientPortal() {
   const [dailyPhrase, setDailyPhrase] = useState('')
   const [showSorteoAlert, setShowSorteoAlert] = useState(false)
   const [showSplash, setShowSplash] = useState(true)
+  const [weightRecords, setWeightRecords] = useState([])
+  const [showWeightModal, setShowWeightModal] = useState(false)
+  const [newWeight, setNewWeight] = useState('')
+  const [newWeightDate, setNewWeightDate] = useState(dayjs().format('YYYY-MM-DD'))
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2500)
@@ -74,8 +79,8 @@ function ClientPortal() {
     setDataLoading(true)
     const config = { headers: { Authorization: `Bearer ${token || localStorage.getItem('clientToken')}` } }
     try {
-      const [p, pay, c, a] = await Promise.all([portalAPI.getProfile(config), portalAPI.getPayments(config), portalAPI.getClasses(config), portalAPI.getAttendance(config)])
-      setProfile(p.data); setPayments(pay.data); setClasses(c.data); setAttendance(a.data)
+      const [p, pay, c, a, w] = await Promise.all([portalAPI.getProfile(config), portalAPI.getPayments(config), portalAPI.getClasses(config), portalAPI.getAttendance(config), weightRecordsAPI.getAll(config)])
+      setProfile(p.data); setPayments(pay.data); setClasses(c.data); setAttendance(a.data); setWeightRecords(w.data)
       // Mostrar alerta de sorteo si pago antes del 10
       const today = dayjs()
       const hasPaidThisMonth = pay.data.some(payment => {
@@ -110,6 +115,29 @@ function ClientPortal() {
   const handleLogout = () => { localStorage.removeItem('clientToken'); setIsLoggedIn(false); setProfile(null) }
   const handleEnroll = async (id) => { try { const c = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }; await portalAPI.enroll(id, c); message.success('Anotada!'); loadData() } catch(e) { message.error(e.response?.data?.error || 'Error') } }
   const handleUnenroll = async (id) => { try { const c = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }; await portalAPI.unenroll(id, c); message.success('Saliste'); loadData() } catch(e) { message.error(e.response?.data?.error || 'Error') } }
+
+  const handleSaveWeight = async () => {
+    const w = parseFloat(newWeight)
+    if (!w || w <= 0) return message.warning('Ingresá un peso válido')
+    try {
+      const c = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }
+      await weightRecordsAPI.create({ weight: w, date: newWeightDate }, c)
+      message.success('Peso registrado!')
+      setShowWeightModal(false)
+      setNewWeight('')
+      setNewWeightDate(dayjs().format('YYYY-MM-DD'))
+      loadData()
+    } catch (e) { message.error(e.response?.data?.error || 'Error') }
+  }
+
+  const handleDeleteWeight = async (id) => {
+    try {
+      const c = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }
+      await weightRecordsAPI.remove(id, c)
+      setWeightRecords(prev => prev.filter(r => r.id !== id))
+      message.success('Registro eliminado')
+    } catch (e) { message.error('Error') }
+  }
 
   const todayDayName = dayjs().format('dddd').toLowerCase()
   const dayMap = { lunes: 'monday', martes: 'tuesday', miercoles: 'wednesday', jueves: 'thursday', viernes: 'friday' }
@@ -163,11 +191,19 @@ function ClientPortal() {
   const dayNames = { monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miercoles', thursday: 'Jueves', friday: 'Viernes' }
   const whatsappLink = `https://wa.me/5493388414420?text=${encodeURIComponent('Hola! Te envio mi comprobante de pago')}`
 
+  // Weight progress data
+  const sortedWeight = [...weightRecords].sort((a, b) => new Date(a.date) - new Date(b.date))
+  const initialWeight = sortedWeight.length > 0 ? parseFloat(sortedWeight[0].weight) : 0
+  const currentWeight = sortedWeight.length > 0 ? parseFloat(sortedWeight[sortedWeight.length - 1].weight) : 0
+  const weightDiff = sortedWeight.length >= 2 ? currentWeight - initialWeight : 0
+  const chartData = sortedWeight.map(r => ({ date: dayjs(r.date).format('DD/MM'), weight: parseFloat(r.weight) }))
+
   // Bottom nav tabs
   const tabs = [
     { key: 'inicio', icon: <HomeOutlined />, label: 'Inicio' },
     { key: 'entrenos', icon: <CalendarOutlined />, label: 'Entrenos' },
     { key: 'pagos', icon: <DollarOutlined />, label: 'Pagos' },
+    { key: 'progreso', icon: <LineChartOutlined />, label: 'Progreso' },
     { key: 'perfil', icon: <UserOutlined />, label: 'Quien soy?' }
   ]
 
@@ -419,6 +455,153 @@ function ClientPortal() {
               </div>
             ))}
           </Card>
+        </div>
+      )}
+
+      {/* ===== MI PROGRESO ===== */}
+      {activeTab === 'progreso' && (
+        <div>
+          <Title level={4} style={{ color: '#ff1493', marginBottom: 16 }}>Mi Progreso</Title>
+
+          {/* Registrar peso */}
+          <motion.div {...stagger(0)}>
+            <Card style={{ ...cardGlow, padding: 16, marginBottom: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>Registrar mi peso</Text>
+                <Button type="primary" icon={<PlusOutlined />} size="small" onClick={() => setShowWeightModal(true)} style={{ borderRadius: 8 }}>Registrar peso</Button>
+              </div>
+              {sortedWeight.length > 0 ? (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div>
+                      <Text style={{ color: '#888', fontSize: 11 }}>Peso actual</Text>
+                      <Text style={{ color: '#ff1493', fontSize: 22, fontWeight: 'bold', display: 'block' }}>{currentWeight} kg</Text>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <Text style={{ color: '#888', fontSize: 11 }}>Ultimo registro</Text>
+                      <Text style={{ color: '#ccc', fontSize: 13, display: 'block' }}>{dayjs(sortedWeight[sortedWeight.length - 1].date).format('DD/MM/YYYY')}</Text>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Text style={{ color: '#555', fontSize: 13 }}>Todavia no registraaste tu peso. Toca "Registrar peso" para empezar.</Text>
+              )}
+            </Card>
+          </motion.div>
+
+          {/* Resumen */}
+          {sortedWeight.length >= 2 && (
+            <motion.div {...stagger(1)}>
+              <Row gutter={[8, 8]} style={{ marginBottom: 14 }}>
+                <Col span={12}>
+                  <Card style={{ ...cardBase, padding: 12 }}>
+                    <Text style={{ color: '#888', fontSize: 10 }}>Peso inicial</Text>
+                    <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', display: 'block' }}>{initialWeight} kg</Text>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card style={{ ...cardBase, padding: 12 }}>
+                    <Text style={{ color: '#888', fontSize: 10 }}>Peso actual</Text>
+                    <Text style={{ color: '#ff1493', fontSize: 18, fontWeight: 'bold', display: 'block' }}>{currentWeight} kg</Text>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card style={{ ...cardBase, padding: 12 }}>
+                    <Text style={{ color: '#888', fontSize: 10 }}>Diferencia</Text>
+                    <Text style={{ color: weightDiff < 0 ? '#52c41a' : weightDiff > 0 ? '#faad14' : '#fff', fontSize: 18, fontWeight: 'bold', display: 'block' }}>{weightDiff > 0 ? '+' : ''}{weightDiff.toFixed(1)} kg</Text>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card style={{ ...cardBase, padding: 12 }}>
+                    <Text style={{ color: '#888', fontSize: 10 }}>Registros</Text>
+                    <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', display: 'block' }}>{sortedWeight.length}</Text>
+                  </Card>
+                </Col>
+              </Row>
+            </motion.div>
+          )}
+
+          {/* Mensaje motivacional */}
+          {sortedWeight.length >= 2 && (
+            <motion.div {...stagger(2)}>
+              <Card style={{ ...cardBase, padding: 14, marginBottom: 14, borderLeft: '3px solid #ff1493' }}>
+                <Text style={{ color: '#ccc', fontSize: 12, display: 'block', marginBottom: 6 }}>Tu progreso no se mide solo en kilos. Cada entrenamiento, cada esfuerzo y cada pequeno cambio cuenta.</Text>
+                <Text style={{ color: weightDiff < 0 ? '#52c41a' : weightDiff === 0 ? '#faad14' : '#ff69b4', fontSize: 13, fontWeight: '600', display: 'block' }}>
+                  {weightDiff < 0 ? 'Excelente! Estas avanzando. Cada esfuerzo esta dando sus frutos.' : weightDiff === 0 ? 'Mantener tambien es progreso. Lo importante es que seguis adelante.' : 'Un numero no define tu progreso. Segui entrenando y enfocandote en sentirte cada dia mas fuerte.'}
+                </Text>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Grafico */}
+          {sortedWeight.length > 0 && (
+            <motion.div {...stagger(3)}>
+              <Card style={{ ...cardBase, padding: 16, marginBottom: 14 }}>
+                <Text style={{ color: '#fff', fontSize: 12, display: 'block', marginBottom: 10 }}>Evolucion de mi peso</Text>
+                {sortedWeight.length >= 2 ? (
+                  <ResponsiveContainer width="100%" height={180}>
+                    <LineChart data={chartData} margin={{ left: -10, right: 10, top: 5, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#222" />
+                      <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#666' }} axisLine={false} tickLine={false} />
+                      <YAxis domain={['auto', 'auto']} tick={{ fontSize: 10, fill: '#666' }} axisLine={false} tickLine={false} width={35} />
+                      <Tooltip contentStyle={{ background: '#1e1e22', border: '1px solid #333', borderRadius: 10, fontSize: 12 }} labelStyle={{ color: '#fff' }} formatter={(v) => [`${v} kg`, 'Peso']} />
+                      <Line type="monotone" dataKey="weight" stroke="#ff1493" strokeWidth={2.5} dot={{ fill: '#ff1493', r: 4 }} activeDot={{ r: 6, fill: '#ff1493' }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <Text style={{ color: '#555', fontSize: 12, display: 'block', textAlign: 'center', padding: '20px 0' }}>Agrega mas registros para ver tu evolucion</Text>
+                )}
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Historial */}
+          {sortedWeight.length > 0 && (
+            <motion.div {...stagger(4)}>
+              <Card style={{ ...cardBase, padding: 16 }}>
+                <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 10 }}>Historial de peso</Text>
+                {sortedWeight.slice().reverse().map((record) => (
+                  <div key={record.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #1a1a1a' }}>
+                    <Text style={{ color: '#ccc', fontSize: 13 }}>{dayjs(record.date).format('DD/MM/YYYY')} — <Text style={{ color: '#fff', fontWeight: '500' }}>{parseFloat(record.weight)} kg</Text></Text>
+                    <Button type="text" size="small" icon={<DeleteOutlined />} onClick={() => handleDeleteWeight(record.id)} style={{ color: '#666' }} />
+                  </div>
+                ))}
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Modal registrar peso */}
+          <Modal
+            title={<Text style={{ color: '#fff' }}>Registrar peso</Text>}
+            open={showWeightModal}
+            onOk={handleSaveWeight}
+            onCancel={() => { setShowWeightModal(false); setNewWeight(''); setNewWeightDate(dayjs().format('YYYY-MM-DD')) }}
+            okText="Guardar"
+            cancelText="Cancelar"
+            styles={{ body: { padding: '16px 0' }, content: { background: '#1e1e22', border: '1px solid #333' }, header: { background: '#1e1e22' } }}
+          >
+            <div style={{ marginBottom: 12 }}>
+              <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 6 }}>Peso (kg)</Text>
+              <Input
+                type="number"
+                step="0.1"
+                min="1"
+                placeholder="Ej: 68.5"
+                value={newWeight}
+                onChange={(e) => setNewWeight(e.target.value)}
+                style={{ borderRadius: 10 }}
+              />
+            </div>
+            <div>
+              <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 6 }}>Fecha</Text>
+              <Input
+                type="date"
+                value={newWeightDate}
+                onChange={(e) => setNewWeightDate(e.target.value)}
+                style={{ borderRadius: 10 }}
+              />
+            </div>
+          </Modal>
         </div>
       )}
 

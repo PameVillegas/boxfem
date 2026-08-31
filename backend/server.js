@@ -23,6 +23,7 @@ app.use('/api/alerts', require('./routes/alerts'))
 app.use('/api/whatsapp', require('./routes/whatsapp'))
 app.use('/api/portal', require('./routes/clientPortal'))
 app.use('/api/phrases', require('./routes/phrases'))
+app.use('/api/weight-records', require('./routes/weightRecords'))
 
 // En producción, servir el frontend estático
 if (process.env.NODE_ENV === 'production') {
