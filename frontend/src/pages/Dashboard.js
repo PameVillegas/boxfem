@@ -380,8 +380,20 @@ function Dashboard() {
                 </div>
                 <Text style={{ fontSize: 13, color: '#888' }}>Proxima clase</Text>
               </div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 2 }}>—</div>
-              <div style={{ fontSize: 12, color: '#555' }}>Sin clases programadas</div>
+              {stats?.nextClass ? (
+                <>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 2 }}>{stats.nextClass.name}</div>
+                  <div style={{ fontSize: 12, color: '#888' }}>{stats.nextClass.dayName} {stats.nextClass.startTime}-{stats.nextClass.endTime}</div>
+                  <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>
+                    {stats.nextClass.isToday ? 'Hoy' : stats.nextClass.daysAhead === 1 ? 'Mañana' : `En ${stats.nextClass.daysAhead} días`}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 2 }}>—</div>
+                  <div style={{ fontSize: 12, color: '#555' }}>Sin clases programadas</div>
+                </>
+              )}
             </div>
           </Card>
         </Col>
@@ -408,8 +420,19 @@ function Dashboard() {
                 </div>
                 <Text style={{ fontSize: 13, color: '#888' }}>Racha de asistencia</Text>
               </div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 2 }}>—</div>
-              <div style={{ fontSize: 12, color: '#555' }}>datos no disponibles</div>
+              {stats?.topStreak ? (
+                <>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 2 }}>
+                    {stats.topStreak.streak} días
+                  </div>
+                  <div style={{ fontSize: 12, color: '#888' }}>{stats.topStreak.name}</div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 2 }}>—</div>
+                  <div style={{ fontSize: 12, color: '#555' }}>datos no disponibles</div>
+                </>
+              )}
             </div>
           </Card>
         </Col>
