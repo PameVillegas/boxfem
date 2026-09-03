@@ -76,6 +76,11 @@ function Payments() {
 
   const methodLabels = { cash: 'Efectivo', transfer: 'Transferencia', card: 'Tarjeta', mercadopago: 'MercadoPago' }
 
+  // Alumnas activas que NO tienen ningun pago registrado en el mes seleccionado
+  const paidIds = new Set(payments.map(p => p.Client?.id).filter(Boolean))
+  const monthName = dayjs(`${year}-${month}`, 'YYYY-M').format('MMMM YYYY')
+  const faltanPagar = clients.filter(c => c.status === 'active' && !paidIds.has(c.id))
+
   const columns = [
     { title: 'Fecha', dataIndex: 'paymentDate', render: (d) => dayjs(d).format('DD/MM/YY'), width: 80 },
     { title: 'Cliente', key: 'client', ellipsis: true, render: (_, r) => {
@@ -128,14 +133,17 @@ function Payments() {
         </div>
         {filter === 'pending' && (
           <div>
-            <Text style={{ fontSize: 12, color: '#ff4d4f', display: 'block', marginBottom: 8 }}>Alumnas con cuota vencida:</Text>
-            {clients.filter(c => c.status === 'expired').length === 0 ? (
-              <Text style={{ color: '#52c41a', fontSize: 12 }}>Todas al dia!</Text>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text style={{ fontSize: 12, color: '#ff4d4f', display: 'block' }}>Faltan pagar el mes de {monthName}:</Text>
+              <Tag color="red" style={{ borderRadius: 8 }}>{faltanPagar.length}</Tag>
+            </div>
+            {faltanPagar.length === 0 ? (
+              <Text style={{ color: '#52c41a', fontSize: 12 }}>Todas pagaron este mes!</Text>
             ) : (
-              clients.filter(c => c.status === 'expired').map(c => (
+              faltanPagar.map(c => (
                 <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1a1a1a' }}>
                   <Text style={{ fontSize: 13 }}>{c.name} {c.lastName}</Text>
-                  <Text style={{ fontSize: 11, color: '#ff4d4f' }}>Vencio {dayjs(c.expirationDate).format('DD/MM')}</Text>
+                  <Text style={{ fontSize: 11, color: '#ff4d4f' }}>Vence {dayjs(c.expirationDate).format('DD/MM')}</Text>
                 </div>
               ))
             )}
