@@ -125,6 +125,7 @@ function Dashboard() {
   const totalClients = stats?.totalClients || 0
   const activeClients = stats?.activeClients || 0
   const expiredClients = stats?.expiredClients || 0
+  const pendingPayments = stats?.pendingPayments
   const todayAttendance = stats?.todayAttendance || 0
   const attendancePct = totalClients > 0 ? Math.round((todayAttendance / totalClients) * 100) : 0
   const activePct = totalClients > 0 ? Math.round((activeClients / totalClients) * 100) : 0
@@ -398,7 +399,7 @@ function Dashboard() {
           </Card>
         </Col>
         <Col xs={24} sm={8}>
-          <Card bodyStyle={{ padding: 0 }} style={miniCardStyle}>
+          <Card bodyStyle={{ padding: 0 }} style={{ ...miniCardStyle, cursor: 'pointer' }} onClick={() => navigate('/payments')}>
             <div style={{ padding: '18px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                 <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(250,173,20,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -406,8 +407,8 @@ function Dashboard() {
                 </div>
                 <Text style={{ fontSize: 13, color: '#888' }}>Pagos pendientes</Text>
               </div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 2 }}>{expiredClients}</div>
-              <div style={{ fontSize: 12, color: '#555' }}>alumnas con pago vencido</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 2 }}>{pendingPayments}</div>
+              <div style={{ fontSize: 12, color: '#555' }}>alumnas sin pagar el mes</div>
             </div>
           </Card>
         </Col>

@@ -19,6 +19,20 @@ router.get('/stats', async (req, res) => {
     const monthStart = now.startOf('month').format('YYYY-MM-DD')
     const monthEnd = now.endOf('month').format('YYYY-MM-DD')
 
+    // Alumnas activas que no tienen ningun pago registrado en el mes actual
+    let pendingPayments = 0
+    try {
+      const monthPays = await Payment.findAll({
+        attributes: ['clientId'],
+        where: { paymentDate: { [Op.between]: [monthStart, monthEnd] } }
+      })
+      const paidIds = new Set(monthPays.map(p => p.clientId))
+      const allActive = await Client.findAll({ attributes: ['id'], where: { status: 'active' } })
+      pendingPayments = allActive.filter(c => !paidIds.has(c.id)).length
+    } catch (e) {
+      pendingPayments = 0
+    }
+
     const monthlyPayments = await Payment.findAll({
       where: { paymentDate: { [Op.between]: [monthStart, monthEnd] } },
       attributes: [[fn('COALESCE', fn('SUM', col('amount')), 0), 'total']]
@@ -121,6 +135,7 @@ router.get('/stats', async (req, res) => {
       monthlyIncome: parseFloat(monthlyPayments[0]?.getDataValue('total') || 0),
       todayAttendance,
       popularClasses,
+      pendingPayments,
       nextClass,
       topStreak
     })
