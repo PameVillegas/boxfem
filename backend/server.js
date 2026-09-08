@@ -13,6 +13,10 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+app.get('/healthz', (req, res) => {
+  res.json({ ok: true, time: Date.now() })
+})
+
 app.use('/api/auth', require('./routes/auth'))
 app.use('/api/clients', require('./routes/clients'))
 app.use('/api/payments', require('./routes/payments'))
@@ -84,6 +88,15 @@ async function start() {
     console.log('Tablas sincronizadas')
     app.listen(process.env.PORT, '0.0.0.0', () => {
       console.log(`Servidor corriendo en puerto ${process.env.PORT}`)
+      const http = require('http')
+      setTimeout(() => {
+        http.get(`http://127.0.0.1:${process.env.PORT}/healthz`, (res) => {
+          console.log(`SELF-PROBE /healthz -> ${res.statusCode}`)
+          res.resume()
+        }).on('error', (e) => {
+          console.log(`SELF-PROBE /healthz -> ERROR: ${e.message}`)
+        })
+      }, 1000)
     })
 
     // Solo iniciar WhatsApp si ya hay sesión guardada
