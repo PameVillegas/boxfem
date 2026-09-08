@@ -21,10 +21,12 @@ const sequelize = new Sequelize(
       max: 3
     },
     dialectOptions: isProduction ? {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      },
+      ...(process.env.DB_SSL === 'disable' ? {} : {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
+      }),
       connectTimeout: 30000
     } : {}
   }
