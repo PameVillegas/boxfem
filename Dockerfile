@@ -28,8 +28,8 @@ RUN rm -rf frontend
 WORKDIR /app/backend
 
 ENV NODE_ENV=production
-ENV PORT=5000
+ENV PORT=80
 
-EXPOSE 5000
+EXPOSE 80
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "PORT=80 node server.js"]

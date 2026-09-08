@@ -68,6 +68,7 @@ cron.schedule('30 10,11,16,17,21,22 * * 1-5', async () => {
 })
 
 async function start() {
+  console.log('### BOX-BOOT ###')
   try {
     await sequelize.authenticate()
     console.log('PostgreSQL conectado')
