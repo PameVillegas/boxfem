@@ -89,21 +89,25 @@ async function start() {
     console.log('Tablas sincronizadas')
     app.listen(process.env.PORT, '0.0.0.0', () => {
       console.log(`Servidor corriendo en puerto ${process.env.PORT}`)
-      const http = require('http')
-      setTimeout(() => {
-        http.get(`http://127.0.0.1:${process.env.PORT}/healthz`, (res) => {
-          console.log(`SELF-PROBE /healthz -> ${res.statusCode}`)
-          res.resume()
-        }).on('error', (e) => {
-          console.log(`SELF-PROBE /healthz -> ERROR: ${e.message}`)
-        })
-      }, 1000)
     })
 
     // Solo iniciar WhatsApp si ya hay sesión guardada
     const fs = require('fs')
     const path = require('path')
     const sessionPath = path.join(__dirname, 'wa_session')
+
+    // Restaurar sesión de WhatsApp desde variable (para el día del cambio)
+    const credsB64 = process.env.WA_CREDS_B64
+    if (credsB64) {
+      const credsPath = path.join(sessionPath, 'creds.json')
+      if (!fs.existsSync(credsPath)) {
+        fs.writeFileSync(credsPath, Buffer.from(credsB64, 'base64').toString('utf8'))
+        console.log('creds.json restaurado desde WA_CREDS_B64')
+      } else {
+        console.log('creds.json ya existe, no se restaura')
+      }
+    }
+
     const hasSession = fs.existsSync(path.join(sessionPath, 'creds.json'))
     if (hasSession) {
       console.log('Sesión de WhatsApp encontrada, reconectando...')
