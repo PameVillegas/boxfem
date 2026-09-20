@@ -419,14 +419,16 @@ function Dashboard() {
                 <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,77,79,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <FireOutlined style={{ color: '#ff7875', fontSize: 14 }} />
                 </div>
-                <Text style={{ fontSize: 13, color: '#888' }}>Racha de asistencia</Text>
+                <Text style={{ fontSize: 13, color: '#888' }}>Asistencia del mes</Text>
               </div>
-              {stats?.topStreak ? (
+              {stats?.topMonthlyAttendance?.length ? (
                 <>
                   <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 2 }}>
-                    {stats.topStreak.streak} días
+                    {stats.topMonthlyAttendance[0].count} asistencias
                   </div>
-                  <div style={{ fontSize: 12, color: '#888' }}>{stats.topStreak.name}</div>
+                  <div style={{ fontSize: 12, color: '#fff', marginBottom: 2 }}>
+                    {stats.topMonthlyAttendance.map(t => t.name).join(', ')}
+                  </div>
                 </>
               ) : (
                 <>

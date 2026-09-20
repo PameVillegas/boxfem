@@ -28,6 +28,7 @@ function ClientPortal() {
   const [payments, setPayments] = useState([])
   const [classes, setClasses] = useState([])
   const [attendance, setAttendance] = useState([])
+  const [monthCount, setMonthCount] = useState(0)
   const [dataLoading, setDataLoading] = useState(false)
   const [showEditTurnos, setShowEditTurnos] = useState(false)
   const [activeTab, setActiveTab] = useState('inicio')
@@ -95,7 +96,7 @@ function ClientPortal() {
     const config = { headers: { Authorization: `Bearer ${token || localStorage.getItem('clientToken')}` } }
     try {
       const [p, pay, c, a, w] = await Promise.all([portalAPI.getProfile(config), portalAPI.getPayments(config), portalAPI.getClasses(config), portalAPI.getAttendance(config), weightRecordsAPI.getAll(config)])
-      setProfile(p.data); setPayments(pay.data); setClasses(c.data); setAttendance(a.data); setWeightRecords(w.data)
+      setProfile(p.data); setPayments(pay.data); setClasses(c.data); setAttendance(a.data.attendance); setMonthCount(a.data.monthCount || 0); setWeightRecords(w.data)
       // Mostrar alerta de sorteo si pago antes del 10
       const today = dayjs()
       const hasPaidThisMonth = pay.data.some(payment => {
@@ -199,7 +200,7 @@ function ClientPortal() {
   const todayEng = dayMap[todayDayName] || ''
   const hasClassToday = enrolledClasses.some(c => c.dayOfWeek === todayEng)
   const paidBeforeTen = payments.some(p => { const d = dayjs(p.paymentDate); return d.month() === dayjs().month() && d.year() === dayjs().year() && d.date() <= 10 })
-  const monthClasses = attendance.length
+  const monthClasses = monthCount
   const monthGoal = enrolledDays * 4 || 4
   const progress = Math.min(Math.round((monthClasses / monthGoal) * 100), 100)
   const classesByDay = {}; classes.forEach(c => { const d = c.dayOfWeek || 'x'; if (!classesByDay[d]) classesByDay[d] = []; classesByDay[d].push(c) })
@@ -256,7 +257,7 @@ function ClientPortal() {
                 <Text style={{ color: '#666', fontSize: 11 }}>{dayjs().format('dddd DD MMM').toUpperCase()}</Text>
                 <Title level={3} style={{ margin: '2px 0 0', background: 'linear-gradient(90deg, #ff1493, #ff69b4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Hola {profile?.name}!</Title>
                 <Text style={{ color: '#888', fontSize: 13 }}>
-                  {hasClassToday ? 'Hoy tenes entrenamiento 🥊' : monthClasses > 0 ? `Esta semana llevas ${monthClasses} entrenamiento${monthClasses > 1 ? 's' : ''}` : 'Bienvenida de nuevo'}
+                  {hasClassToday ? 'Hoy tenes entrenamiento 🥊' : monthClasses > 0 ? `Este mes llevas ${monthClasses} entrenamiento${monthClasses !== 1 ? 's' : ''}` : 'Bienvenida de nuevo'}
                 </Text>
               </div>
             </div>

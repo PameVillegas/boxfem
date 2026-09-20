@@ -128,6 +128,30 @@ router.get('/stats', async (req, res) => {
       topStreak = null
     }
 
+    // Asistencia mensual: alumna/s con mas asistencias en el mes actual (pueden ser varias, mismas en el tope)
+    let topMonthlyAttendance = []
+    try {
+      const rows = await Attendance.findAll({
+        attributes: ['clientId', [fn('COUNT', col('Attendance.id')), 'count']],
+        where: { date: { [Op.between]: [monthStart, monthEnd] } },
+        group: ['clientId'],
+        order: [[literal('count'), 'DESC']]
+      })
+      if (rows.length > 0) {
+        const maxCount = parseInt(rows[0].getDataValue('count'), 10)
+        const topIds = rows.filter(r => parseInt(r.getDataValue('count'), 10) === maxCount).map(r => r.clientId)
+        const clients = await Client.findAll({ attributes: ['id', 'name', 'lastName'], where: { id: topIds } })
+        const byId = {}
+        clients.forEach(c => { byId[c.id] = c })
+        topMonthlyAttendance = topIds.map(id => {
+          const c = byId[id]
+          return c ? { name: `${c.name} ${c.lastName || ''}`.trim(), count: maxCount } : null
+        }).filter(Boolean)
+      }
+    } catch (e) {
+      topMonthlyAttendance = []
+    }
+
     res.json({
       totalClients,
       activeClients,
@@ -137,7 +161,8 @@ router.get('/stats', async (req, res) => {
       popularClasses,
       pendingPayments,
       nextClass,
-      topStreak
+      topStreak,
+      topMonthlyAttendance
     })
   } catch (error) {
     res.status(500).json({ error: error.message })

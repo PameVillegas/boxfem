@@ -109,7 +109,10 @@ router.get('/attendance', clientAuth, async (req, res) => {
       order: [['date', 'DESC']],
       limit: 30
     })
-    res.json(attendance)
+    const monthCount = await Attendance.count({
+      where: { clientId: req.clientId, date: { [Op.gte]: dayjs().startOf('month').format('YYYY-MM-DD') } }
+    })
+    res.json({ attendance, monthCount })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
