@@ -2,10 +2,11 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const cron = require('node-cron')
+const fs = require('fs')
 const path = require('path')
 const sequelize = require('./db/database')
 const { checkPendingPayments, checkDailyExpirations } = require('./jobs/paymentAlerts')
-const { initWhatsApp } = require('./services/whatsapp')
+const { initWhatsApp, restartConnection } = require('./services/whatsapp')
 
 require('./models/index')
 
@@ -65,6 +66,15 @@ const { sendPreClassReminders } = require('./jobs/preClassReminder')
 cron.schedule('30 10,11,16,17,21,22 * * 1-5', async () => {
   console.log('Verificando recordatorios pre-clase...')
   await sendPreClassReminders()
+})
+
+// Auto-reinicio diario de WhatsApp (evita sesión degradada / mensajes en espera)
+cron.schedule('0 5 * * *', () => {
+  const sessionPath = path.join(__dirname, 'wa_session', 'creds.json')
+  if (fs.existsSync(sessionPath)) {
+    console.log('Auto-reinicio diario de WhatsApp...')
+    restartConnection()
+  }
 })
 
 async function start() {

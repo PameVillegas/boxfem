@@ -29,7 +29,7 @@ async function checkPendingPayments() {
 
     for (const client of expiringSoon) {
       const msg = `🧤 *FemmBox - Recordatorio de Pago*\n\nHola ${client.name}, recordá abonar tu cuota antes del 10 de este mes para evitar recargos.\n\nGracias!`
-      await Alert.create({
+      const alert = await Alert.create({
         clientId: client.id,
         type: 'payment_reminder',
         message: `${client.name} ${client.lastName} debe abonar antes del 10, sino tiene 10% de recargo`,
@@ -37,6 +37,7 @@ async function checkPendingPayments() {
       })
       try {
         await whatsapp.sendMessage(client.phone, msg)
+        await alert.update({ status: 'sent' })
         console.log(`WhatsApp enviado a ${client.name} ${client.lastName}`)
       } catch (e) {
         console.log(`No se pudo enviar WhatsApp a ${client.name}: ${e.message}`)
@@ -54,7 +55,7 @@ async function checkPendingPayments() {
 
     for (const client of unpaid) {
       const msg = `⚠️ *FemmBox - Aviso de Recargo*\n\nHola ${client.name}, tu cuota está vencida y se aplicó un recargo del 10%. Pasá a regularizar tu situación.\n\nGracias!`
-      await Alert.create({
+      const alert = await Alert.create({
         clientId: client.id,
         type: 'surcharge',
         message: `${client.name} ${client.lastName} - Recargo del 10% aplicado`,
@@ -62,6 +63,7 @@ async function checkPendingPayments() {
       })
       try {
         await whatsapp.sendMessage(client.phone, msg)
+        await alert.update({ status: 'sent' })
         console.log(`Recargo notificado a ${client.name}`)
       } catch (e) {
         console.log(`No se pudo notificar a ${client.name}: ${e.message}`)
@@ -86,7 +88,7 @@ async function checkPendingPayments() {
 
       if (!paidThisMonth) {
         const msg = `🚨 *FemmBox - Cuota Pendiente + Recargo*\n\nHola ${client.name}, tu cuota aún no fue abonada. A partir del día 10, se aplicó un recargo del 10%.\n\nRegularizá tu situación para seguir entrenando.\n\nAlias: FEMMBOX93\n\nGracias!`
-        await Alert.create({
+        const alert = await Alert.create({
           clientId: client.id,
           type: 'surcharge',
           message: `${client.name} ${client.lastName} - Dia 15: cuota pendiente + recargo 10%`,
@@ -94,6 +96,7 @@ async function checkPendingPayments() {
         })
         try {
           await whatsapp.sendMessage(client.phone, msg)
+          await alert.update({ status: 'sent' })
           console.log(`Aviso dia 15 enviado a ${client.name} ${client.lastName}`)
         } catch (e) {
           console.log(`No se pudo notificar a ${client.name}: ${e.message}`)
@@ -114,7 +117,7 @@ async function checkDailyExpirations() {
     await client.save()
 
     const msg = `⏰ *FemmBox - Cuota Vencida*\n\nHola ${client.name}, tu cuota venció el ${dayjs(client.expirationDate).format('DD/MM/YYYY')}. Acercate a renovar para seguir entrenando.`
-    await Alert.create({
+    const alert = await Alert.create({
       clientId: client.id,
       type: 'expiration',
       message: `${client.name} ${client.lastName} - Cuota vencida`,
@@ -122,6 +125,7 @@ async function checkDailyExpirations() {
     })
     try {
       await whatsapp.sendMessage(client.phone, msg)
+      await alert.update({ status: 'sent' })
     } catch (e) {
       console.log(`No se pudo notificar vencimiento a ${client.name}`)
     }
