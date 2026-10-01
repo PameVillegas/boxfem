@@ -207,6 +207,19 @@ function ClientPortal() {
   const dayNames = { monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miercoles', thursday: 'Jueves', friday: 'Viernes' }
   const whatsappLink = `https://wa.me/5493388414420?text=${encodeURIComponent('Hola! Te envio mi comprobante de pago')}`
 
+  // Historial de asistencias agrupado por mes
+  const currentMonthKey = dayjs().format('YYYY-MM')
+  const currentMonthLabel = dayjs().format('MMMM YYYY')
+  const totalAttendance = attendance.length
+  const attendanceByMonth = attendance.reduce((acc, item) => {
+    const d = dayjs(item.date)
+    const key = d.format('YYYY-MM')
+    let group = acc.find(x => x.key === key)
+    if (!group) { group = { key, label: d.format('MMMM YYYY'), count: 0 }; acc.push(group) }
+    group.count++
+    return acc
+  }, []).sort((a, b) => (a.key < b.key ? 1 : -1))
+
   // Weight progress data
   const sortedWeight = [...weightRecords].sort((a, b) => new Date(a.date) - new Date(b.date))
   const initialWeight = sortedWeight.length > 0 ? parseFloat(sortedWeight[0].weight) : 0
@@ -309,20 +322,6 @@ function ClientPortal() {
             </Col>
           </Row>
 
-          {/* Sorteo mensual */}
-          <motion.div {...stagger(4)}>
-            <Card style={{ ...cardBase, padding: 14, marginBottom: 14, borderColor: paidBeforeTen ? '#52c41a33' : '#d4a01733' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Text style={{ fontSize: 22 }}>🎁</Text>
-                <div>
-                  <Text style={{ color: paidBeforeTen ? '#52c41a' : '#d4a017', fontSize: 13, fontWeight: '600' }}>{paidBeforeTen ? 'Estas participando del Sorteo Mensual!' : 'Sorteo mensual'}</Text>
-                  <br />
-                  <Text style={{ color: '#888', fontSize: 11 }}>{paidBeforeTen ? 'Por pagar en termino! Mucha suerte!' : 'Paga antes del 10 y participa del sorteo'}</Text>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-
           {/* Frase del dia */}
           {dailyPhrase && (
             <motion.div {...stagger(4)}>
@@ -403,6 +402,47 @@ function ClientPortal() {
         <div>
           <Title level={4} style={{ color: '#ff1493', marginBottom: 16 }}>Mis Horarios</Title>
           <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 12 }}>Lunes: Piernas y Gluteos | Martes y Jueves: Entrenamiento Fisico | Miercoles: Espalda, Brazos y Boxeo | Viernes: Resistencia</Text>
+
+          {/* Asistencias */}
+          <Card style={{ ...cardGlow, padding: 16, marginBottom: 14 }}>
+            <Text style={{ color: '#fff', fontSize: 12, display: 'block', marginBottom: 10 }}>Asistencias</Text>
+            <Row gutter={[10, 10]}>
+              <Col span={12}>
+                <div style={{ background: '#0f0f0f', border: '1px solid #222', borderRadius: 12, padding: 12 }}>
+                  <Text style={{ color: '#666', fontSize: 10, display: 'block' }}>MES ACTUAL</Text>
+                  <Text style={{ color: '#ff1493', fontSize: 24, fontWeight: 'bold', display: 'block', lineHeight: 1.3 }}>{monthClasses}</Text>
+                  <Text style={{ color: '#888', fontSize: 11, display: 'block', textTransform: 'capitalize' }}>{currentMonthLabel}</Text>
+                </div>
+              </Col>
+              <Col span={12}>
+                <div style={{ background: '#0f0f0f', border: '1px solid #222', borderRadius: 12, padding: 12 }}>
+                  <Text style={{ color: '#666', fontSize: 10, display: 'block' }}>HISTORICO</Text>
+                  <Text style={{ color: '#ff69b4', fontSize: 24, fontWeight: 'bold', display: 'block', lineHeight: 1.3 }}>{totalAttendance}</Text>
+                  <Text style={{ color: '#888', fontSize: 11, display: 'block' }}>asistencias registradas</Text>
+                </div>
+              </Col>
+            </Row>
+            {attendanceByMonth.length === 0 ? (
+              <Text style={{ color: '#444', fontSize: 12, display: 'block', marginTop: 12 }}>Todavia no tenes asistencias registradas</Text>
+            ) : (
+              <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid #222' }}>
+                <Text style={{ color: '#888', fontSize: 11, display: 'block', marginBottom: 4 }}>Historial por mes</Text>
+                {attendanceByMonth.map(group => (
+                  <div key={group.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: '1px solid #1a1a1a' }}>
+                    <Text style={{ color: group.key === currentMonthKey ? '#ff1493' : '#ccc', fontSize: 12, textTransform: 'capitalize' }}>
+                      {group.label}{group.key === currentMonthKey ? ' (mes actual)' : ''}
+                    </Text>
+                    <Text style={{ color: group.key === currentMonthKey ? '#ff1493' : '#888', fontSize: 12, fontWeight: 'bold' }}>
+                      {group.key === currentMonthKey ? monthClasses : group.count} asist.
+                    </Text>
+                  </div>
+                ))}
+                {attendance.length >= 30 && (
+                  <Text style={{ color: '#444', fontSize: 10, display: 'block', marginTop: 6 }}>Mostrando los ultimos 30 registros</Text>
+                )}
+              </div>
+            )}
+          </Card>
           {enrolledClasses.length > 0 && !showEditTurnos && (
             <Card style={{ ...cardGlow, padding: 16, marginBottom: 14 }}>
               {['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].map(day => {
