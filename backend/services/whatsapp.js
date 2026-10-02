@@ -12,9 +12,34 @@ let qrBase64 = null
 let pairingCode = null
 let connectionState = 'disconnected'
 let retryCount = 0
+let connectedAt = 0
+let watchdogTimer = null
 
 const MAX_RETRIES = 5
+const STABLE_CONNECTION_MS = 60000
+const REPLACED_DELAY_MS = 45000
+const WATCHDOG_INTERVAL_MS = 300000
 const sessionPath = path.join(__dirname, '..', 'wa_session')
+
+// Reiniciar el contador de reintentos y cancelar el watchdog
+function resetRetries() {
+  retryCount = 0
+  if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null }
+}
+
+// Si se agotan los reintentos no morir: reintentar cada 5 minutos
+// hasta que la sesión vuelva a estar disponible
+function scheduleWatchdog() {
+  if (watchdogTimer) return
+  watchdogTimer = setTimeout(async () => {
+    watchdogTimer = null
+    retryCount = 0
+    if (hasSession()) {
+      console.log('[WhatsApp] Watchdog: reintentando conexión')
+      await initWhatsApp()
+    }
+  }, WATCHDOG_INTERVAL_MS)
+}
 
 // Verificar si hay sesión guardada
 function hasSession() {
@@ -96,8 +121,11 @@ async function initWhatsApp(phoneNumber = null) {
         isReady = true
         qrBase64 = null
         pairingCode = null
-        retryCount = 0
+        connectedAt = Date.now()
         connectionState = 'connected'
+        // Solo se limpian los reintentos si venía de una sesión sana:
+        // reiniciarlos acá hacía que el loop de reconexión nunca termine
+        if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null }
         console.log('[WhatsApp] ✅ CONECTADO')
       }
 
@@ -108,6 +136,8 @@ async function initWhatsApp(phoneNumber = null) {
         pairingCode = null
 
         const statusCode = lastDisconnect?.error?.output?.statusCode
+        const uptime = connectedAt ? Date.now() - connectedAt : 0
+        connectedAt = 0
         console.log(`[WhatsApp] Desconectado (código: ${statusCode})`)
 
         // Logout: limpiar todo
@@ -119,10 +149,20 @@ async function initWhatsApp(phoneNumber = null) {
           return
         }
 
+        // Conexión estable antes de caerse: el problema no era la sesión
+        if (uptime > STABLE_CONNECTION_MS) retryCount = 0
+
+        // 440 = conexión reemplazada. Pasa al reiniciar el contenedor con
+        // otra instancia viva: hay que esperar a que la otra libere la sesión
+        const replaced = statusCode === DisconnectReason.connectionReplaced
+        if (replaced) {
+          console.log('[WhatsApp] Conexión reemplazada, esperando a la otra instancia')
+        }
+
         // Si hay credenciales guardadas, reconectar
         if (hasSession() && retryCount < MAX_RETRIES) {
           retryCount++
-          const delay = Math.min(retryCount * 2000, 10000)
+          const delay = replaced ? REPLACED_DELAY_MS : Math.min(retryCount * 2000, 10000)
           connectionState = 'reconnecting'
           console.log(`[WhatsApp] Reconectando en ${delay/1000}s (${retryCount}/${MAX_RETRIES})`)
           setTimeout(() => initWhatsApp(), delay)
@@ -135,7 +175,8 @@ async function initWhatsApp(phoneNumber = null) {
           connectionState = 'disconnected'
           retryCount = 0
           sock = null
-          console.log('[WhatsApp] Máximo de reintentos')
+          console.log('[WhatsApp] Máximo de reintentos, queda en espera')
+          scheduleWatchdog()
         }
       }
     })
@@ -150,14 +191,14 @@ async function initWhatsApp(phoneNumber = null) {
 }
 
 async function connectWithCode(phoneNumber) {
-  retryCount = 0
+  resetRetries()
   await clearSession()
   await new Promise(resolve => setTimeout(resolve, 1000))
   await initWhatsApp(phoneNumber)
 }
 
 async function restartConnection() {
-  retryCount = 0
+  resetRetries()
   if (hasSession()) {
     await initWhatsApp()
   } else {
@@ -171,7 +212,7 @@ async function restartConnection() {
 }
 
 async function startQR() {
-  retryCount = 0
+  resetRetries()
   await clearSession()
   await new Promise(resolve => setTimeout(resolve, 1000))
   await initWhatsApp() // Sin número = modo QR
@@ -214,6 +255,7 @@ async function logout() {
   qrBase64 = null
   pairingCode = null
   connectionState = 'disconnected'
+  resetRetries()
   await clearSession()
 }
 
