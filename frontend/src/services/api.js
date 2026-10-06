@@ -60,6 +60,7 @@ export const attendanceAPI = {
   getFixedQR: () => api.get('/attendance/qr-fixed'),
   qrCheckIn: (token, clientId) => api.post('/attendance/qr-checkin', { token, clientId }),
   autoCheckIn: (clientId) => api.post('/attendance/qr-auto-checkin', { clientId }),
+  setMode: (id, modo, config) => api.post(`/portal/attendance/${id}/mode`, { modo }, config),
   remove: (id) => api.delete(`/attendance/${id}`)
 }
 

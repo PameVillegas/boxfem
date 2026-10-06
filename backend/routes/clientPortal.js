@@ -4,6 +4,16 @@ const jwt = require('jsonwebtoken')
 const { Client, Payment, Attendance, Class } = require('../models')
 const { Op } = require('sequelize')
 const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+// Mismo criterio que routes/attendance.js: el servidor corre en UTC pero el
+// dia de la alumna se mide en Argentina
+const argToday = () => dayjs().tz('America/Argentina/Buenos_Aires').format('YYYY-MM-DD')
+
+const MODOS_VALIDOS = ['guerrera', 'tranqui', 'descarga', 'fuerza', 'recuperacion', 'sin_ganas']
 
 // Login de cliente con nombre + apellido + código personal
 router.post('/login', async (req, res) => {
@@ -115,6 +125,36 @@ router.get('/attendance', clientAuth, async (req, res) => {
     res.json({ attendance, monthCount })
   } catch (error) {
     res.status(500).json({ error: error.message })
+  }
+})
+
+// Elegir o cambiar el modo de una asistencia. Solo el mismo dia (Argentina).
+// Es opcional: si la alumna no lo elige, la asistencia queda registrada y el
+// modo permanece en NULL. Este endpoint nunca crea ni borra asistencias.
+router.post('/attendance/:id/mode', clientAuth, async (req, res) => {
+  try {
+    const { modo } = req.body
+
+    if (!MODOS_VALIDOS.includes(modo)) {
+      return res.status(400).json({ error: 'Modo invalido' })
+    }
+
+    const attendance = await Attendance.findByPk(req.params.id)
+    if (!attendance || Number(attendance.clientId) !== Number(req.clientId)) {
+      return res.status(404).json({ error: 'Asistencia no encontrada' })
+    }
+
+    const attendanceDay = dayjs(attendance.date).format('YYYY-MM-DD')
+    if (attendanceDay !== argToday()) {
+      return res.status(400).json({ error: 'El modo solo se puede elegir o cambiar el mismo dia de la asistencia' })
+    }
+
+    attendance.modo = modo
+    await attendance.save()
+
+    res.json({ success: true, attendance })
+  } catch (error) {
+    res.status(400).json({ error: error.message })
   }
 })
 

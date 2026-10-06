@@ -2,11 +2,19 @@ import React, { useState, useEffect } from 'react'
 import { Card, Typography, Input, Button, message, Tag, List, Space, Spin, Empty, Row, Col, Alert, Modal } from 'antd'
 import { UserOutlined, LockOutlined, CalendarOutlined, DollarOutlined, CheckCircleOutlined, LogoutOutlined, ClockCircleOutlined, EnvironmentOutlined, InstagramOutlined, HomeOutlined, TrophyOutlined, DeleteOutlined, PlusOutlined, LineChartOutlined } from '@ant-design/icons'
 import { portalAPI, phrasesAPI, attendanceAPI, weightRecordsAPI, settingsAPI } from '../services/api'
+import FemmBoxModo, { getModo } from '../components/FemmBoxModo'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import dayjs from 'dayjs'
 import 'dayjs/locale/es'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 dayjs.locale('es')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+// El dia de la alumna se mide igual que en el backend (routes/attendance.js)
+const argTodayKey = () => dayjs().tz('America/Argentina/Buenos_Aires').format('YYYY-MM-DD')
 
 const { Title, Text } = Typography
 
@@ -40,6 +48,12 @@ function ClientPortal() {
   const [newWeight, setNewWeight] = useState('')
   const [newWeightDate, setNewWeightDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [prices, setPrices] = useState({ price_2x: 25000, price_3x: 30000, price_completa: 35000 })
+  // FemmBox Modo: asistencia registrada primero, el modo es opcional y posterior
+  const [modoOpen, setModoOpen] = useState(false)
+  const [modoAttendance, setModoAttendance] = useState(null)
+  const [modoInitial, setModoInitial] = useState(null)
+  const [modoSaving, setModoSaving] = useState(false)
+  const [modoError, setModoError] = useState('')
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2500)
@@ -109,8 +123,10 @@ function ClientPortal() {
       if (pendingQR && p.data.id) {
         try {
           const res = await attendanceAPI.qrCheckIn(pendingQR, p.data.id)
-          if (res.data.success) message.success('Asistencia registrada!')
-          else message.info(res.data.message || 'Ya registrada')
+          if (res.data.success) {
+            message.success('Asistencia registrada!')
+            openModoFlow(res.data.attendance)
+          } else message.info(res.data.message || 'Ya registrada')
         } catch (e) { message.error(e.response?.data?.error || 'Error con QR') }
         localStorage.removeItem('pendingQR')
       }
@@ -119,8 +135,10 @@ function ClientPortal() {
       if (pendingAuto && p.data.id) {
         try {
           const res = await attendanceAPI.autoCheckIn(p.data.id)
-          if (res.data.success) message.success('Asistencia registrada! ' + (res.data.className || ''))
-          else message.info(res.data.message || 'Ya registrada hoy')
+          if (res.data.success) {
+            message.success('Asistencia registrada! ' + (res.data.className || ''))
+            openModoFlow(res.data.attendance)
+          } else message.info(res.data.message || 'Ya registrada hoy')
         } catch (e) { message.error(e.response?.data?.error || 'Error') }
         localStorage.removeItem('pendingAutoCheckin')
       }
@@ -131,6 +149,44 @@ function ClientPortal() {
   const handleLogout = () => { localStorage.removeItem('clientToken'); setIsLoggedIn(false); setProfile(null) }
   const handleEnroll = async (id) => { try { const c = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }; await portalAPI.enroll(id, c); message.success('Anotada!'); loadData() } catch(e) { message.error(e.response?.data?.error || 'Error') } }
   const handleUnenroll = async (id) => { try { const c = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }; await portalAPI.unenroll(id, c); message.success('Saliste'); loadData() } catch(e) { message.error(e.response?.data?.error || 'Error') } }
+
+  // FemmBox Modo: se abre solo despues de una asistencia registrada, o desde
+  // la card de Inicio mientras siga siendo el mismo dia.
+  const openModoFlow = (att) => {
+    try {
+      if (!att) return
+      // Dejar la asistencia recien registrada en el estado local: sin esto la
+      // card de Inicio no apareceria hasta que se vuelva a pedir al servidor.
+      setAttendance(prev => {
+        const arr = Array.isArray(prev) ? prev : []
+        const nueva = { id: att.id, date: att.date, method: att.method, checkInTime: att.checkInTime, modo: att.modo || null, Class: null }
+        return arr.some(a => a.id === att.id) ? arr : [nueva, ...arr]
+      })
+      setModoAttendance({ id: att.id })
+      setModoInitial(att.modo || null)
+      setModoError('')
+      setModoOpen(true)
+    } catch (e) {}
+  }
+
+  // Guardar el modo. Nunca puede afectar la asistencia: ya esta registrada.
+  // Si el guardado falla, solo se muestra el aviso y todo sigue igual.
+  const handleModoSave = async (code) => {
+    if (!modoAttendance) return
+    setModoSaving(true)
+    setModoError('')
+    try {
+      const c = { headers: { Authorization: `Bearer ${localStorage.getItem('clientToken')}` } }
+      await attendanceAPI.setMode(modoAttendance.id, code, c)
+      setAttendance(prev => Array.isArray(prev) ? prev.map(a => (a.id === modoAttendance.id ? { ...a, modo: code } : a)) : prev)
+      setModoOpen(false)
+      message.success('¡Modo guardado! ' + (getModo(code)?.emoji || ''))
+    } catch (e) {
+      setModoError(e.response?.data?.error || 'No se pudo guardar el modo. Tu asistencia sigue registrada.')
+    } finally {
+      setModoSaving(false)
+    }
+  }
 
   const handleSaveWeight = async () => {
     const w = parseFloat(newWeight)
@@ -203,6 +259,11 @@ function ClientPortal() {
   const monthClasses = monthCount
   const monthGoal = enrolledDays * 4 || 4
   const progress = Math.min(Math.round((monthClasses / monthGoal) * 100), 100)
+
+  // FemmBox Modo: la asistencia de hoy, unica que permite elegir o cambiar modo
+  const todayKey = argTodayKey()
+  const todayAttendance = (Array.isArray(attendance) ? attendance : []).find(a => dayjs(a.date).format('YYYY-MM-DD') === todayKey)
+  const todayModo = todayAttendance?.modo || null
   const classesByDay = {}; classes.forEach(c => { const d = c.dayOfWeek || 'x'; if (!classesByDay[d]) classesByDay[d] = []; classesByDay[d].push(c) })
   const dayNames = { monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miercoles', thursday: 'Jueves', friday: 'Viernes' }
   const whatsappLink = `https://wa.me/5493388414420?text=${encodeURIComponent('Hola! Te envio mi comprobante de pago')}`
@@ -275,6 +336,31 @@ function ClientPortal() {
               </div>
             </div>
           </motion.div>
+
+          {/* FemmBox Modo: solo el mismo dia de la asistencia */}
+          {todayAttendance && (
+            <motion.div {...stagger(0.5)}>
+              <Card style={{ ...cardGlow, padding: 14, marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <div style={{ flex: 1 }}>
+                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: 600, display: 'block' }}>💜 ¿Cómo llegaste hoy?</Text>
+                    <Text style={{ color: '#888', fontSize: 11, display: 'block', marginTop: 4 }}>
+                      {todayModo
+                        ? <>Hoy elegiste {getModo(todayModo)?.emoji} {getModo(todayModo)?.name}</>
+                        : <>Tu asistencia de hoy todavía no tiene un modo.</>}
+                    </Text>
+                  </div>
+                  <Button
+                    size="small"
+                    onClick={() => openModoFlow(todayAttendance)}
+                    style={{ borderRadius: 10, flexShrink: 0 }}
+                  >
+                    {todayModo ? 'CAMBIAR MODO' : 'ELEGIR MI MODO'}
+                  </Button>
+                </div>
+              </Card>
+            </motion.div>
+          )}
 
           {/* Progreso principal */}
           <motion.div {...stagger(1)}>
@@ -725,6 +811,16 @@ function ClientPortal() {
       </AnimatePresence>
 
       </div>
+
+      {/* ===== FEMMBOX MODO ===== */}
+      <FemmBoxModo
+        open={modoOpen}
+        initialMode={modoInitial}
+        saving={modoSaving}
+        saveError={modoError}
+        onSave={handleModoSave}
+        onClose={() => setModoOpen(false)}
+      />
 
       {/* ===== FOOTER ===== */}
       <div style={{ textAlign: 'center', padding: '20px 16px 70px', background: '#0a0a0a' }}>

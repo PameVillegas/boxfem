@@ -5,6 +5,7 @@ const cron = require('node-cron')
 const fs = require('fs')
 const path = require('path')
 const sequelize = require('./db/database')
+const migrateSafe = require('./db/migrate-safe')
 const { checkPendingPayments, checkDailyExpirations } = require('./jobs/paymentAlerts')
 const { initWhatsApp, restartConnection } = require('./services/whatsapp')
 
@@ -82,6 +83,22 @@ async function start() {
   try {
     await sequelize.authenticate()
     console.log('PostgreSQL conectado')
+
+    // Migraciones aditivas e idempotentes. Van ANTES de sequelize.sync():
+    // sync() sin alter() no agrega columnas a tablas existentes, asi que sin
+    // esto la columna "modo" no existiria y los SELECT de asistencia
+    // fallarian en produccion.
+    try {
+      const applied = await migrateSafe()
+      applied.forEach(line => console.log(`Migracion: ${line}`))
+    } catch (migrationError) {
+      console.error('### MIGRACION FALLIDA ###')
+      console.error(`No se pudo preparar el esquema: ${migrationError.message}`)
+      console.error('El servidor NO se inicia, para no quedar corriendo con un esquema incompatible.')
+      console.error('Revisar la columna "modo" de la tabla Attendances.')
+      process.exit(1)
+    }
+
     await sequelize.sync()
 
     const { Setting } = require('./models')
