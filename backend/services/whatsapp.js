@@ -14,6 +14,7 @@ let connectionState = 'disconnected'
 let retryCount = 0
 let connectedAt = 0
 let watchdogTimer = null
+let reconnectTimer = null
 
 const MAX_RETRIES = 5
 const STABLE_CONNECTION_MS = 60000
@@ -25,6 +26,7 @@ const sessionPath = path.join(__dirname, '..', 'wa_session')
 function resetRetries() {
   retryCount = 0
   if (watchdogTimer) { clearTimeout(watchdogTimer); watchdogTimer = null }
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
 }
 
 // Si se agotan los reintentos no morir: reintentar cada 5 minutos
@@ -47,6 +49,10 @@ function hasSession() {
 }
 
 async function initWhatsApp(phoneNumber = null) {
+  // Cancelar cualquier reconexión programada: si no, un timer pendiente
+  // (p.ej. tras el reinicio diario o el botón del admin) abriría un socket
+  // duplicado con la misma sesión -> connectionReplaced (440) + Bad MAC.
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
   // Limpiar socket anterior
   if (sock) {
     try {
@@ -79,6 +85,7 @@ async function initWhatsApp(phoneNumber = null) {
       keepAliveIntervalMs: 30000,
       markOnlineOnConnect: false
     })
+    const mySock = sock
 
     // Pairing code: solicitar antes de que se genere QR
     if (usePairingCode && !state.creds.registered) {
@@ -103,6 +110,8 @@ async function initWhatsApp(phoneNumber = null) {
     }
 
     sock.ev.on('connection.update', async (update) => {
+      // Ignorar eventos de un socket ya reemplazado por una conexión más nueva
+      if (mySock !== sock) return
       const { connection, lastDisconnect, qr } = update
 
       // QR generado (solo si no usamos pairing code)
@@ -165,7 +174,8 @@ async function initWhatsApp(phoneNumber = null) {
           const delay = replaced ? REPLACED_DELAY_MS : Math.min(retryCount * 2000, 10000)
           connectionState = 'reconnecting'
           console.log(`[WhatsApp] Reconectando en ${delay/1000}s (${retryCount}/${MAX_RETRIES})`)
-          setTimeout(() => initWhatsApp(), delay)
+          if (reconnectTimer) clearTimeout(reconnectTimer)
+          reconnectTimer = setTimeout(() => { reconnectTimer = null; initWhatsApp() }, delay)
         } else if (!hasSession()) {
           // No hay sesión, volver a estado inicial
           connectionState = 'disconnected'
