@@ -7,6 +7,7 @@ import {
   DollarOutlined, 
   CalendarOutlined, 
   CheckCircleOutlined,
+  SmileOutlined,
   WhatsAppOutlined,
   LogoutOutlined,
   MenuOutlined,
@@ -22,6 +23,7 @@ const menuItems = [
   { key: '/payments', icon: <DollarOutlined />, label: 'Pagos' },
   { key: '/classes', icon: <CalendarOutlined />, label: 'Clases' },
   { key: '/attendance', icon: <CheckCircleOutlined />, label: 'Asistencia' },
+  { key: '/modos', icon: <SmileOutlined />, label: 'Modos' },
   { key: '/whatsapp', icon: <WhatsAppOutlined />, label: 'WhatsApp' },
   { key: '/prices', icon: <TagsOutlined />, label: 'Precios' }
 ]

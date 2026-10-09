@@ -9,6 +9,7 @@ import Clients from './pages/Clients'
 import Payments from './pages/Payments'
 import Classes from './pages/Classes'
 import Attendance from './pages/Attendance'
+import Modos from './pages/Modos'
 import WhatsAppConfig from './pages/WhatsAppConfig'
 import Prices from './pages/Prices'
 import Navbar from './components/Navbar'
@@ -39,6 +40,7 @@ function AppContent() {
           <Route path="/payments" element={<PrivateRoute><Payments /></PrivateRoute>} />
           <Route path="/classes" element={<PrivateRoute><Classes /></PrivateRoute>} />
           <Route path="/attendance" element={<PrivateRoute><Attendance /></PrivateRoute>} />
+          <Route path="/modos" element={<PrivateRoute><Modos /></PrivateRoute>} />
           <Route path="/whatsapp" element={<PrivateRoute><WhatsAppConfig /></PrivateRoute>} />
           <Route path="/prices" element={<PrivateRoute><Prices /></PrivateRoute>} />
           <Route path="/" element={<Navigate to="/portal" replace />} />
